@@ -1,13 +1,9 @@
 #[cfg(feature = "chrono")]
-mod clock;
-mod error;
-mod event;
-mod id;
-mod repository;
+pub mod clock;
+pub mod event;
+pub mod id;
+pub mod repository;
 
-#[cfg(feature = "chrono")]
-pub use clock::*;
+mod error;
+
 pub use error::*;
-pub use event::*;
-pub use id::*;
-pub use repository::*;

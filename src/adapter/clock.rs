@@ -1,4 +1,4 @@
-use crate::port::Clock;
+use crate::port::clock::Clock;
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct SystemClock;

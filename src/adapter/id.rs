@@ -1,5 +1,5 @@
 use crate::domain::EntityId;
-use crate::port::IdGenerator;
+use crate::port::id::IdGenerator;
 
 #[derive(Debug, Clone)]
 pub struct UuidV4Generator<Id>(core::marker::PhantomData<fn() -> Id>);
