@@ -144,8 +144,7 @@ mod test {
     fn execute_returns_err_from_failing_use_case() {
         let use_case = FailingUseCase;
 
-        let error =
-            block_on(use_case.execute("bad".to_string())).expect_err("execute should fail");
+        let error = block_on(use_case.execute("bad".to_string())).expect_err("execute should fail");
 
         assert_eq!(
             error,
