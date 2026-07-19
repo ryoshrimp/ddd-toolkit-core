@@ -1,3 +1,4 @@
+mod aggregate;
 mod entity;
 mod entity_id;
 mod enum_vo;
@@ -6,6 +7,7 @@ mod event;
 mod secret_vo;
 mod vo;
 
+pub use aggregate::*;
 pub use entity::*;
 pub use entity_id::*;
 pub use enum_vo::*;
