@@ -6,6 +6,11 @@ edition = "2024"
 [dependencies]
 trait-variant = "0.1.2"
 uuid = { version = "1.24.0", optional = true, features = ["v4", "v7"] }
+chrono = { version = "0.4.45", optional = true, default-features = false, features = [
+    "clock",
+    "std",
+] }
 
 [features]
 uuid = ["dep:uuid"]
+chrono = ["dep:chrono"]
