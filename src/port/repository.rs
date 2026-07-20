@@ -7,6 +7,22 @@ pub trait Load<A: AggregateRoot> {
 
 #[trait_variant::make(Send)]
 pub trait Save<A: AggregateRoot> {
+    /// Persists the aggregate, draining and recording any events it has
+    /// accumulated via [`AggregateRoot::take_events`].
+    ///
+    /// Implementations backed by optimistic concurrency control (e.g. a
+    /// stored version/etag compared against the aggregate's current state)
+    /// should return `Err` with [`PortErrorKind::Conflict`] when the
+    /// stored version has moved on since the aggregate was loaded, so the
+    /// caller can reload and retry. The in-memory reference implementations
+    /// in this crate (`mock::repository::InMemoryStore` and the doctest
+    /// fixtures) intentionally do not: they have no notion of a stored
+    /// version and always last-write-wins, so they never produce
+    /// `Conflict`. A real backend copying them as a starting point should
+    /// add its own version check rather than assume last-write-wins is
+    /// the port's default behavior.
+    ///
+    /// [`PortErrorKind::Conflict`]: crate::port::PortErrorKind::Conflict
     async fn save(&self, aggregate: &mut A) -> Result<(), PortError>;
 }
 

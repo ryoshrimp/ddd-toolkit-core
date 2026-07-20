@@ -65,6 +65,10 @@ impl<A: AggregateRoot + Clone> Load<A> for InMemoryStore<A> {
 }
 
 impl<A: AggregateRoot + Clone> Save<A> for InMemoryStore<A> {
+    // Intentionally last-write-wins: this double has no stored version to
+    // compare against, so it never returns PortErrorKind::Conflict. See the
+    // `Save` trait's doc comment for what a real, version-checked backend
+    // should do instead.
     async fn save(&self, aggregate: &mut A) -> Result<(), PortError> {
         let events = aggregate.take_events();
         let mut state = self.state.lock().unwrap_or_else(|e| e.into_inner());
