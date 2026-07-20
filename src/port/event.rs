@@ -1,8 +1,48 @@
+use std::fmt;
+
 use crate::{domain::DomainEvent, port::PortError};
+
+/// A `dispatch` failure that reports which events were not delivered, so a
+/// caller can retry or persist just the remainder instead of losing track
+/// of the whole batch.
+///
+/// Implementors that dispatch events one at a time should populate
+/// `undelivered` with every event from the input that was not confirmed
+/// delivered (typically the failing event and everything after it).
+/// Implementors that dispatch atomically (all-or-nothing) should populate
+/// it with the entire input batch on failure.
+#[derive(Debug)]
+pub struct DispatchError<E> {
+    pub undelivered: Vec<E>,
+    pub source: PortError,
+}
+
+impl<E> DispatchError<E> {
+    pub fn new(undelivered: Vec<E>, source: PortError) -> Self {
+        Self { undelivered, source }
+    }
+}
+
+impl<E: fmt::Debug> fmt::Display for DispatchError<E> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "dispatch failed with {} undelivered event(s): {}",
+            self.undelivered.len(),
+            self.source
+        )
+    }
+}
+
+impl<E: fmt::Debug> std::error::Error for DispatchError<E> {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        Some(&self.source)
+    }
+}
 
 #[trait_variant::make(Send)]
 pub trait EventDispatcher<E: DomainEvent> {
-    async fn dispatch(&self, events: Vec<E>) -> Result<(), PortError>;
+    async fn dispatch(&self, events: Vec<E>) -> Result<(), DispatchError<E>>;
 }
 
 #[cfg(test)]
@@ -13,7 +53,7 @@ mod test {
 
     use super::*;
 
-    #[derive(Debug, PartialEq)]
+    #[derive(Debug, Clone, PartialEq)]
     struct FooEvent {
         name: String,
     }
@@ -41,7 +81,7 @@ mod test {
     }
 
     impl EventDispatcher<FooEvent> for RecordingDispatcher {
-        async fn dispatch(&self, events: Vec<FooEvent>) -> Result<(), PortError> {
+        async fn dispatch(&self, events: Vec<FooEvent>) -> Result<(), DispatchError<FooEvent>> {
             self.dispatched.lock().unwrap().extend(events);
             Ok(())
         }
@@ -50,8 +90,28 @@ mod test {
     struct FailingDispatcher;
 
     impl EventDispatcher<FooEvent> for FailingDispatcher {
-        async fn dispatch(&self, _events: Vec<FooEvent>) -> Result<(), PortError> {
-            Err(PortError::unavailable("dispatch failed"))
+        async fn dispatch(&self, events: Vec<FooEvent>) -> Result<(), DispatchError<FooEvent>> {
+            Err(DispatchError::new(
+                events,
+                PortError::unavailable("dispatch failed"),
+            ))
+        }
+    }
+
+    // Dispatches events one at a time, failing on (and after) the event
+    // whose name is "boom" - a stand-in for a partial-failure dispatcher.
+    struct PartiallyFailingDispatcher;
+
+    impl EventDispatcher<FooEvent> for PartiallyFailingDispatcher {
+        async fn dispatch(&self, events: Vec<FooEvent>) -> Result<(), DispatchError<FooEvent>> {
+            let boom_at = events.iter().position(|e| e.name == "boom");
+            match boom_at {
+                Some(index) => Err(DispatchError::new(
+                    events[index..].to_vec(),
+                    PortError::unavailable("dispatch failed"),
+                )),
+                None => Ok(()),
+            }
         }
     }
 
@@ -88,7 +148,7 @@ mod test {
         fn publish<D: EventDispatcher<FooEvent>>(
             dispatcher: &D,
             events: Vec<FooEvent>,
-        ) -> Result<(), PortError> {
+        ) -> Result<(), DispatchError<FooEvent>> {
             block_on(dispatcher.dispatch(events))
         }
 
@@ -109,7 +169,50 @@ mod test {
         let error = block_on(dispatcher.dispatch(vec![FooEvent::new("created")]))
             .expect_err("dispatch should fail");
 
-        assert_eq!(error.kind(), PortErrorKind::Unavailable);
+        assert_eq!(error.source.kind(), PortErrorKind::Unavailable);
+    }
+
+    #[test]
+    fn dispatch_error_reports_the_undelivered_events() {
+        let dispatcher = FailingDispatcher;
+        let events = vec![FooEvent::new("created"), FooEvent::new("renamed")];
+
+        let error = block_on(dispatcher.dispatch(events)).expect_err("dispatch should fail");
+
+        assert_eq!(
+            error.undelivered,
+            vec![FooEvent::new("created"), FooEvent::new("renamed")]
+        );
+    }
+
+    #[test]
+    fn partial_failure_reports_only_the_events_after_the_failure_point() {
+        let dispatcher = PartiallyFailingDispatcher;
+        let events = vec![
+            FooEvent::new("created"),
+            FooEvent::new("boom"),
+            FooEvent::new("renamed"),
+        ];
+
+        let error = block_on(dispatcher.dispatch(events)).expect_err("dispatch should fail");
+
+        assert_eq!(
+            error.undelivered,
+            vec![FooEvent::new("boom"), FooEvent::new("renamed")]
+        );
+    }
+
+    #[test]
+    fn dispatch_error_display_includes_undelivered_count_and_source() {
+        let error = DispatchError::new(
+            vec![FooEvent::new("created")],
+            PortError::unavailable("boom"),
+        );
+
+        assert_eq!(
+            error.to_string(),
+            "dispatch failed with 1 undelivered event(s): Unavailable: boom"
+        );
     }
 
     #[test]
