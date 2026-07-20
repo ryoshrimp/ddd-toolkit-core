@@ -3,3 +3,6 @@ pub mod application;
 pub mod domain;
 pub mod mock;
 pub mod port;
+
+#[cfg(test)]
+mod testing;

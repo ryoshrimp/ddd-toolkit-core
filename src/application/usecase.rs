@@ -9,24 +9,11 @@ pub trait UseCase {
 
 #[cfg(test)]
 mod test {
-    use std::{
-        fmt::Display,
-        future::Future,
-        pin::pin,
-        task::{Context, Poll, Waker},
-    };
+    use std::fmt::Display;
+
+    use crate::testing::block_on;
 
     use super::*;
-
-    fn block_on<F: Future>(future: F) -> F::Output {
-        let mut future = pin!(future);
-        let mut cx = Context::from_waker(Waker::noop());
-        loop {
-            if let Poll::Ready(output) = future.as_mut().poll(&mut cx) {
-                return output;
-            }
-        }
-    }
 
     #[derive(Debug, PartialEq)]
     struct FooError {

@@ -17,31 +17,15 @@ pub trait Delete<A: AggregateRoot> {
 
 #[cfg(test)]
 mod test {
-    use std::{
-        collections::HashMap,
-        fmt::Display,
-        future::Future,
-        pin::pin,
-        sync::Mutex,
-        task::{Context, Poll, Waker},
-    };
+    use std::{collections::HashMap, fmt::Display, sync::Mutex};
 
     use crate::{
         domain::{DomainEvent, Entity, EntityId, ValueObject},
         port::PortErrorKind,
+        testing::block_on,
     };
 
     use super::*;
-
-    fn block_on<F: Future>(future: F) -> F::Output {
-        let mut future = pin!(future);
-        let mut cx = Context::from_waker(Waker::noop());
-        loop {
-            if let Poll::Ready(output) = future.as_mut().poll(&mut cx) {
-                return output;
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
     struct FooId(String);

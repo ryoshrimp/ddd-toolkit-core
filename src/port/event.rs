@@ -7,26 +7,11 @@ pub trait EventDispatcher<E: DomainEvent> {
 
 #[cfg(test)]
 mod test {
-    use std::{
-        future::Future,
-        pin::pin,
-        sync::Mutex,
-        task::{Context, Poll, Waker},
-    };
+    use std::sync::Mutex;
 
-    use crate::port::PortErrorKind;
+    use crate::{port::PortErrorKind, testing::block_on};
 
     use super::*;
-
-    fn block_on<F: Future>(future: F) -> F::Output {
-        let mut future = pin!(future);
-        let mut cx = Context::from_waker(Waker::noop());
-        loop {
-            if let Poll::Ready(output) = future.as_mut().poll(&mut cx) {
-                return output;
-            }
-        }
-    }
 
     #[derive(Debug, PartialEq)]
     struct FooEvent {

@@ -67,26 +67,14 @@ impl<A: AggregateRoot + Clone> Delete<A> for InMemoryStore<A> {
 
 #[cfg(test)]
 mod test {
-    use std::{
-        fmt::Display,
-        future::Future,
-        pin::pin,
-        task::{Context, Poll, Waker},
+    use std::fmt::Display;
+
+    use crate::{
+        domain::{DomainEvent, Entity, EntityId, ValueObject},
+        testing::block_on,
     };
 
-    use crate::domain::{DomainEvent, Entity, EntityId, ValueObject};
-
     use super::*;
-
-    fn block_on<F: Future>(future: F) -> F::Output {
-        let mut future = pin!(future);
-        let mut cx = Context::from_waker(Waker::noop());
-        loop {
-            if let Poll::Ready(output) = future.as_mut().poll(&mut cx) {
-                return output;
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
     struct FooId(String);
