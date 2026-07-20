@@ -1,6 +1,8 @@
 use crate::domain::EntityId;
 
+/// Generates new [`EntityId`]s, e.g. for a new aggregate.
 pub trait IdGenerator<Id: EntityId>: Send + Sync {
+    /// Generates a new id.
     fn generate(&self) -> Id;
 }
 

@@ -1,10 +1,13 @@
 use crate::{domain::AggregateRoot, port::PortError};
 
+/// Loads an aggregate by id.
 #[trait_variant::make(Send)]
 pub trait Load<A: AggregateRoot> {
+    /// Returns the aggregate with the given id, or `None` if it doesn't exist.
     async fn load(&self, id: &A::Id) -> Result<Option<A>, PortError>;
 }
 
+/// Persists an aggregate.
 #[trait_variant::make(Send)]
 pub trait Save<A: AggregateRoot> {
     /// Persists the aggregate, draining and recording any events it has
@@ -26,6 +29,7 @@ pub trait Save<A: AggregateRoot> {
     async fn save(&self, aggregate: &mut A) -> Result<(), PortError>;
 }
 
+/// Deletes an aggregate.
 #[trait_variant::make(Send)]
 pub trait Delete<A: AggregateRoot> {
     /// Deletes the aggregate with the given id.

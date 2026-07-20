@@ -13,8 +13,10 @@ use crate::domain::EntityId;
 /// `Entity`, implement it in terms of `is_same_as` rather than deriving it,
 /// so `==` and `is_same_as` cannot silently disagree.
 pub trait Entity: Send + Sync {
+    /// This entity's identity type.
     type Id: EntityId;
 
+    /// This entity's identity.
     fn id(&self) -> &Self::Id;
 
     /// Identity comparison: true iff `self` and `other` are the same

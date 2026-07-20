@@ -13,11 +13,14 @@ use crate::{domain::DomainEvent, port::PortError};
 /// it with the entire input batch on failure.
 #[derive(Debug)]
 pub struct DispatchError<E> {
+    /// Events from the input batch that were not confirmed delivered.
     pub undelivered: Vec<E>,
+    /// The underlying failure.
     pub source: PortError,
 }
 
 impl<E> DispatchError<E> {
+    /// Creates a new `DispatchError`.
     pub fn new(undelivered: Vec<E>, source: PortError) -> Self {
         Self { undelivered, source }
     }
@@ -40,8 +43,11 @@ impl<E: fmt::Debug> std::error::Error for DispatchError<E> {
     }
 }
 
+/// Publishes recorded [`DomainEvent`]s, e.g. to a message broker.
 #[trait_variant::make(Send)]
 pub trait EventDispatcher<E: DomainEvent> {
+    /// Dispatches `events`. See [`DispatchError`] for how partial failure
+    /// is reported.
     async fn dispatch(&self, events: Vec<E>) -> Result<(), DispatchError<E>>;
 }
 

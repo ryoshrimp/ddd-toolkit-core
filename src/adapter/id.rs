@@ -8,6 +8,7 @@ macro_rules! uuid_id_generator {
         pub struct $name<Id>(core::marker::PhantomData<fn() -> Id>);
 
         impl<Id> $name<Id> {
+            #[doc = concat!("Creates a new `", stringify!($name), "`.")]
             pub fn new() -> Self {
                 Self(core::marker::PhantomData)
             }

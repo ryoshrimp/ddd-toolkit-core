@@ -1,4 +1,7 @@
+/// A source of the current time, so domain/application code doesn't call
+/// [`chrono::Utc::now`] directly and become untestable.
 pub trait Clock: Send + Sync {
+    /// The current time.
     fn now(&self) -> chrono::DateTime<chrono::Utc>;
 }
 

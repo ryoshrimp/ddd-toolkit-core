@@ -14,12 +14,16 @@ struct StoreState<A: AggregateRoot> {
     events: Vec<A::Event>,
 }
 
+/// A [`Load`]/[`Save`]/[`Delete`] implementation backed by an in-memory
+/// `HashMap`, with last-write-wins semantics (see [`Save`]'s docs for what
+/// that means for `PortErrorKind::Conflict`).
 #[derive(Debug)]
 pub struct InMemoryStore<A: AggregateRoot> {
     state: Mutex<StoreState<A>>,
 }
 
 impl<A: AggregateRoot> InMemoryStore<A> {
+    /// Creates a new, empty store.
     pub fn new() -> Self {
         Self {
             state: Mutex::new(StoreState {
@@ -29,10 +33,12 @@ impl<A: AggregateRoot> InMemoryStore<A> {
         }
     }
 
+    /// Returns and clears every event recorded by a `save` call so far.
     pub fn take_recorded_events(&self) -> Vec<A::Event> {
         std::mem::take(&mut self.state.lock().unwrap_or_else(|e| e.into_inner()).events)
     }
 
+    /// The number of aggregates currently stored.
     pub fn len(&self) -> usize {
         self.state
             .lock()
@@ -41,6 +47,7 @@ impl<A: AggregateRoot> InMemoryStore<A> {
             .len()
     }
 
+    /// Whether the store currently holds no aggregates.
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }

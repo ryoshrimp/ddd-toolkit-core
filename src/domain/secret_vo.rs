@@ -12,11 +12,17 @@ use crate::domain::ValueObject;
 /// generates a `Debug` impl that prints `TypeName(***)` and never the
 /// wrapped value, so prefer the derive over a manual impl wherever possible.
 pub trait SecretVo: ValueObject {
+    /// The wrapped secret's raw type.
     type Inner;
+    /// The error produced when a value fails validation.
     type Error: std::error::Error + Send + Sync + 'static;
 
+    /// Validates and wraps `inner`.
     fn try_new(inner: Self::Inner) -> Result<Self, Self::Error>;
 
+    /// Returns the wrapped secret. Named to make call sites (`key.expose_secret()`
+    /// rather than `key.0`) an explicit, greppable signal that a secret is
+    /// about to be handled directly.
     fn expose_secret(&self) -> &Self::Inner;
 }
 

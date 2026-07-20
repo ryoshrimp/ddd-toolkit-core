@@ -12,11 +12,14 @@ use std::{error::Error, fmt::Display};
 /// the most likely way for it to drift.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ValidationError {
+    /// The name of the type that rejected the value.
     pub type_name: &'static str,
+    /// A human-readable explanation of why the value was rejected.
     pub reason: String,
 }
 
 impl ValidationError {
+    /// Creates a new `ValidationError` for the type named `type_name`.
     pub fn new(type_name: &'static str, reason: impl Into<String>) -> Self {
         Self {
             type_name,

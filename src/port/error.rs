@@ -1,13 +1,22 @@
 use std::fmt::Display;
 
+/// The general category of a [`PortError`], so callers can react (e.g.
+/// retry) without inspecting the underlying error.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum PortErrorKind {
+    /// The operation conflicted with concurrent state (e.g. a stale version
+    /// on `Save`).
     Conflict,
+    /// The port is temporarily unreachable (e.g. a network/connection
+    /// failure); retrying later may succeed.
     Unavailable,
+    /// Any failure not covered by a more specific kind.
     Other,
 }
 
+/// An error from a port implementation (repository, event dispatcher,
+/// etc.), tagged with a [`PortErrorKind`] and wrapping the underlying cause.
 #[derive(Debug)]
 pub struct PortError {
     kind: PortErrorKind,
@@ -15,6 +24,7 @@ pub struct PortError {
 }
 
 impl PortError {
+    /// Creates a new `PortError` of the given kind, wrapping `source`.
     pub fn new(
         kind: PortErrorKind,
         source: impl Into<Box<dyn std::error::Error + Send + Sync>>,
@@ -25,18 +35,22 @@ impl PortError {
         }
     }
 
+    /// Creates a [`PortErrorKind::Conflict`] error.
     pub fn conflict(source: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> Self {
         Self::new(PortErrorKind::Conflict, source)
     }
 
+    /// Creates a [`PortErrorKind::Unavailable`] error.
     pub fn unavailable(source: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> Self {
         Self::new(PortErrorKind::Unavailable, source)
     }
 
+    /// Creates a [`PortErrorKind::Other`] error.
     pub fn other(source: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> Self {
         Self::new(PortErrorKind::Other, source)
     }
 
+    /// This error's kind.
     pub fn kind(&self) -> PortErrorKind {
         self.kind
     }

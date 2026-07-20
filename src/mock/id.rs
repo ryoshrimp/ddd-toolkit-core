@@ -1,5 +1,6 @@
 use crate::{domain::EntityId, port::id::IdGenerator};
 
+/// An [`IdGenerator`] that always returns the same, fixed id.
 #[derive(Debug, Clone)]
 pub struct FixedIdGenerator<Id>(pub Id);
 

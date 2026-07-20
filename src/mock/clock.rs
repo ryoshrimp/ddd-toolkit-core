@@ -1,13 +1,18 @@
 use crate::port::clock::Clock;
 
+/// A [`Clock`] that always returns a configured time until [`FixedClock::set`]
+/// changes it.
 #[derive(Debug)]
 pub struct FixedClock(std::sync::Mutex<chrono::DateTime<chrono::Utc>>);
 
 impl FixedClock {
+    /// Creates a `FixedClock` that returns `now` until [`FixedClock::set`]
+    /// is called.
     pub fn new(now: chrono::DateTime<chrono::Utc>) -> Self {
         Self(std::sync::Mutex::new(now))
     }
 
+    /// Changes the time this clock returns.
     pub fn set(&self, now: chrono::DateTime<chrono::Utc>) {
         *self.0.lock().unwrap_or_else(|e| e.into_inner()) = now;
     }

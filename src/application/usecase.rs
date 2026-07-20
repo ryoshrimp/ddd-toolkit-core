@@ -1,9 +1,15 @@
+/// A single, named application operation that orchestrates domain objects
+/// and ports to do one thing.
 #[trait_variant::make(Send)]
 pub trait UseCase: Send + Sync {
+    /// The input required to run this use case.
     type Input: Send;
+    /// What this use case produces on success.
     type Output: Send;
+    /// What this use case produces on failure.
     type Error: std::error::Error + Send + Sync + 'static;
 
+    /// Runs the use case.
     async fn execute(&self, input: Self::Input) -> Result<Self::Output, Self::Error>;
 }
 

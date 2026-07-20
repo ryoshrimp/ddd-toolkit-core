@@ -1,17 +1,29 @@
 use std::fmt::Debug;
 
+/// A domain object with no identity, whose equality is purely structural:
+/// two value objects are the same if their data is the same.
 pub trait ValueObject: Clone + PartialEq + Debug + Send + Sync {}
 
+/// A type that wraps a single inner value.
 pub trait WrappedInner {
+    /// The wrapped type.
     type Inner;
 }
 
+/// A [`ValueObject`] newtype around a single [`WrappedInner::Inner`] value,
+/// only constructible through validation (`TryFrom<Self::Inner>`).
+///
+/// Note this invariant only holds if the wrapped field is private - see
+/// `#[derive(ValueObject)]` in `ddd-toolkit-macro`, which enforces that at
+/// derive time.
 pub trait Wrapped:
     ValueObject
     + WrappedInner
     + TryFrom<<Self as WrappedInner>::Inner, Error: std::error::Error + Send + Sync + 'static>
 {
+    /// Borrows the wrapped value.
     fn as_inner(&self) -> &Self::Inner;
+    /// Consumes `self`, returning the wrapped value.
     fn into_inner(self) -> Self::Inner;
 }
 

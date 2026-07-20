@@ -1,10 +1,17 @@
 use crate::domain::{DomainEvent, Entity};
 
+/// An [`Entity`] that is a consistency boundary and the unit of persistence:
+/// changes to it (and whatever it contains) are saved and loaded together,
+/// and it records the domain events those changes produce.
 pub trait AggregateRoot: Entity {
+    /// The domain event type this aggregate records.
     type Event: DomainEvent;
 
+    /// Records that `event` happened, to be drained later via
+    /// [`AggregateRoot::take_events`].
     fn record(&mut self, event: Self::Event);
 
+    /// Returns and clears every event recorded since the last call.
     fn take_events(&mut self) -> Vec<Self::Event>;
 }
 

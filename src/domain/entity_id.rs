@@ -1,6 +1,9 @@
 use crate::domain::ValueObject;
 use std::{fmt::Display, hash::Hash};
 
+/// A [`ValueObject`] used as an [`crate::domain::Entity`]'s identity: always
+/// structurally comparable, hashable, orderable, and displayable, so it can
+/// be used as a map key, sorted, and printed.
 pub trait EntityId: ValueObject + Eq + Hash + Ord + Display {}
 
 #[cfg(test)]

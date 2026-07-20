@@ -2,6 +2,13 @@
 name = "ddd-toolkit-core"
 version = "0.2.0"
 edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "Traits and reference implementations for Domain-Driven Design building blocks: entities, value objects, aggregates, repositories, and event dispatch."
+repository = "https://github.com/ryoshrimp/ddd-toolkit-core"
+documentation = "https://docs.rs/ddd-toolkit-core"
+readme = "README.md"
+keywords = ["ddd", "domain-driven-design", "entity", "value-object", "aggregate"]
+categories = ["rust-patterns", "data-structures"]
 
 [dependencies]
 trait-variant = "0.1.2"

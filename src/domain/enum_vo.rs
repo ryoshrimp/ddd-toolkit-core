@@ -16,6 +16,7 @@ use std::fmt::Display;
 pub trait EnumVo:
     ValueObject + FromStr<Err: std::error::Error + Send + Sync + 'static> + Display + Copy + 'static
 {
+    /// Every variant, in the order chosen by the implementation.
     fn variants() -> &'static [Self];
 }
 

@@ -1,5 +1,6 @@
 use crate::port::clock::Clock;
 
+/// A [`Clock`] backed by [`chrono::Utc::now`].
 #[derive(Debug, Clone, Copy, Default)]
 pub struct SystemClock;
 
