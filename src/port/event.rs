@@ -22,7 +22,10 @@ pub struct DispatchError<E> {
 impl<E> DispatchError<E> {
     /// Creates a new `DispatchError`.
     pub fn new(undelivered: Vec<E>, source: PortError) -> Self {
-        Self { undelivered, source }
+        Self {
+            undelivered,
+            source,
+        }
     }
 }
 
