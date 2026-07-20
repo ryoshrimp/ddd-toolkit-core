@@ -1,59 +1,49 @@
 use crate::domain::EntityId;
 use crate::port::id::IdGenerator;
 
-#[derive(Debug, Clone)]
-pub struct UuidV4Generator<Id>(core::marker::PhantomData<fn() -> Id>);
+macro_rules! uuid_id_generator {
+    ($(#[$doc:meta])* $name:ident, $make:path) => {
+        $(#[$doc])*
+        #[derive(Debug, Clone)]
+        pub struct $name<Id>(core::marker::PhantomData<fn() -> Id>);
 
-impl<Id> UuidV4Generator<Id> {
-    pub fn new() -> Self {
-        Self(core::marker::PhantomData)
-    }
-}
-
-impl<Id> Default for UuidV4Generator<Id> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl<Id> IdGenerator<Id> for UuidV4Generator<Id>
-where
-    Id: EntityId + TryFrom<uuid::Uuid, Error = core::convert::Infallible>,
-{
-    fn generate(&self) -> Id {
-        match Id::try_from(uuid::Uuid::new_v4()) {
-            Ok(id) => id,
-            Err(never) => match never {},
+        impl<Id> $name<Id> {
+            pub fn new() -> Self {
+                Self(core::marker::PhantomData)
+            }
         }
-    }
-}
 
-#[derive(Debug, Clone)]
-pub struct UuidV7Generator<Id>(core::marker::PhantomData<fn() -> Id>);
-
-impl<Id> UuidV7Generator<Id> {
-    pub fn new() -> Self {
-        Self(core::marker::PhantomData)
-    }
-}
-
-impl<Id> Default for UuidV7Generator<Id> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl<Id> IdGenerator<Id> for UuidV7Generator<Id>
-where
-    Id: EntityId + TryFrom<uuid::Uuid, Error = core::convert::Infallible>,
-{
-    fn generate(&self) -> Id {
-        match Id::try_from(uuid::Uuid::now_v7()) {
-            Ok(id) => id,
-            Err(never) => match never {},
+        impl<Id> Default for $name<Id> {
+            fn default() -> Self {
+                Self::new()
+            }
         }
-    }
+
+        impl<Id> IdGenerator<Id> for $name<Id>
+        where
+            Id: EntityId + TryFrom<uuid::Uuid, Error = core::convert::Infallible>,
+        {
+            fn generate(&self) -> Id {
+                match Id::try_from($make()) {
+                    Ok(id) => id,
+                    Err(never) => match never {},
+                }
+            }
+        }
+    };
 }
+
+uuid_id_generator!(
+    /// Generates ids from a random (v4) UUID.
+    UuidV4Generator,
+    uuid::Uuid::new_v4
+);
+
+uuid_id_generator!(
+    /// Generates ids from a time-ordered (v7) UUID.
+    UuidV7Generator,
+    uuid::Uuid::now_v7
+);
 
 #[cfg(test)]
 mod test {
