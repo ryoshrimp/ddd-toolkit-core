@@ -1,10 +1,24 @@
 use crate::domain::EntityId;
 
+/// A domain object whose equality is defined by its identity, not its
+/// attributes - the same conceptual entity can change all of its other
+/// fields over time and still be "the same" entity.
+///
+/// This trait deliberately does not require [`PartialEq`]/[`Eq`]: nothing
+/// stops an implementor from also deriving `PartialEq`, but a derived
+/// `PartialEq` compares *every* field structurally, which is almost never
+/// the identity comparison a DDD Entity is supposed to have. Use
+/// [`Entity::is_same_as`] wherever "is this the same entity" is the
+/// question being asked; if you do implement `PartialEq`/`Eq` for an
+/// `Entity`, implement it in terms of `is_same_as` rather than deriving it,
+/// so `==` and `is_same_as` cannot silently disagree.
 pub trait Entity: Send + Sync {
     type Id: EntityId;
 
     fn id(&self) -> &Self::Id;
 
+    /// Identity comparison: true iff `self` and `other` are the same
+    /// entity, regardless of whether their other fields currently match.
     fn is_same_as(&self, other: &Self) -> bool {
         self.id() == other.id()
     }
