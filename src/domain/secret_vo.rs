@@ -1,5 +1,16 @@
 use crate::domain::ValueObject;
 
+/// A value object that wraps a secret (API key, password, token, ...) which
+/// must never appear in logs or error messages by accident.
+///
+/// This trait cannot force a redacting `Debug` impl: `ValueObject` requires
+/// `Debug` to exist, but nothing in the type system can require *what* it
+/// prints. A hand-written `impl SecretVo` (as in this crate's own test
+/// fixtures) is only as safe as its own `Debug`/`Display` impls - it is the
+/// implementor's responsibility to redact. `#[derive(SecretVo)]` in
+/// `ddd-toolkit-macro` closes this gap for derived types: it always
+/// generates a `Debug` impl that prints `TypeName(***)` and never the
+/// wrapped value, so prefer the derive over a manual impl wherever possible.
 pub trait SecretVo: ValueObject {
     type Inner;
     type Error: std::error::Error + Send + Sync + 'static;
