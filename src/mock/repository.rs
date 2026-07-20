@@ -340,8 +340,8 @@ mod test {
         assert_eq!(store.take_recorded_events(), vec![]);
     }
 
-    // Pins this mock's idempotent choice; the Delete trait itself leaves
-    // delete-on-missing-id semantics to implementors.
+    // Pins down the `Delete` port contract: deleting a missing id is
+    // idempotent and must not be treated as an error.
     #[test]
     fn delete_missing_id_is_ok() {
         let store = InMemoryStore::<Foo>::new();

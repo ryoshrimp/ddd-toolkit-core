@@ -12,6 +12,12 @@ pub trait Save<A: AggregateRoot> {
 
 #[trait_variant::make(Send)]
 pub trait Delete<A: AggregateRoot> {
+    /// Deletes the aggregate with the given id.
+    ///
+    /// Deleting an id that does not exist is **not** an error: it is
+    /// idempotent and returns `Ok(())`, the same as if the delete had just
+    /// run again after already succeeding. Implementations must not return
+    /// `Err` solely because the id was already absent.
     async fn delete(&self, id: &A::Id) -> Result<(), PortError>;
 }
 
@@ -296,8 +302,8 @@ mod test {
         check(&repo, &FooId("foo-1".to_string()), &mut foo);
     }
 
-    // The traits leave delete-on-missing-id semantics to implementors; this
-    // pins down the in-memory double's idempotent choice, not a port contract.
+    // Pins down the `Delete` port contract: deleting a missing id is
+    // idempotent and must not be treated as an error.
     #[test]
     fn delete_missing_id_is_ok() {
         let repo = InMemoryFooRepository::new();
