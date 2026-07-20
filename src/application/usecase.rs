@@ -1,5 +1,5 @@
 #[trait_variant::make(Send)]
-pub trait UseCase: Send + Sync {
+pub trait UseCase {
     type Input: Send;
     type Output: Send;
     type Error: std::error::Error + Send + Sync + 'static;
@@ -80,6 +80,18 @@ mod test {
             Err(FooError {
                 message: format!("failed to execute with {input}"),
             })
+        }
+    }
+
+    struct UnitUseCase;
+
+    impl UseCase for UnitUseCase {
+        type Input = ();
+        type Output = ();
+        type Error = FooError;
+
+        async fn execute(&self, _input: Self::Input) -> Result<Self::Output, Self::Error> {
+            Ok(())
         }
     }
 
@@ -174,18 +186,6 @@ mod test {
 
     #[test]
     fn execute_works_with_unit_input_and_output() {
-        struct UnitUseCase;
-
-        impl UseCase for UnitUseCase {
-            type Input = ();
-            type Output = ();
-            type Error = FooError;
-
-            async fn execute(&self, _input: Self::Input) -> Result<Self::Output, Self::Error> {
-                Ok(())
-            }
-        }
-
         let () = block_on(UnitUseCase.execute(())).expect("execute should succeed");
     }
 }
