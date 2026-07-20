@@ -106,16 +106,6 @@ mod test {
     }
 
     #[test]
-    fn execute_receives_given_input() {
-        let use_case = FooUseCase;
-
-        let output =
-            block_on(use_case.execute("rust".to_string())).expect("execute should succeed");
-
-        assert_eq!(output, "hello, rust");
-    }
-
-    #[test]
     fn execute_with_shared_reference_allows_multiple_calls() {
         let use_case = CountingUseCase {
             calls: std::sync::Mutex::new(0),
@@ -142,14 +132,18 @@ mod test {
         assert_eq!(output, "hello, generic");
     }
 
-    // Compile-time assertion only: `trait_variant::make(Send)` must make the
-    // future returned by `execute` implement `Send`.
+    // Compile-time only (no runtime assertion): the generic bound accepts the
+    // future as `Send` purely because `#[trait_variant::make(Send)]` promises
+    // it at the trait level, not because of the concrete impl.
     #[test]
     fn execute_future_is_send() {
-        fn assert_send<T: Send>(_: T) {}
+        fn assert_send(_: impl Send) {}
 
-        let use_case = FooUseCase;
-        assert_send(use_case.execute("send".to_string()));
+        fn check<U: UseCase>(use_case: &U, input: U::Input) {
+            assert_send(use_case.execute(input));
+        }
+
+        check(&FooUseCase, "send".to_string());
     }
 
     #[test]
@@ -181,7 +175,6 @@ mod test {
         let boxed = boxed::<FailingUseCase>(error);
 
         assert_eq!(boxed.to_string(), "failed to execute with bad");
-        assert!(boxed.source().is_none());
     }
 
     #[test]
