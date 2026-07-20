@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.2.0] - 2026-07-20
+## [0.2.1] - 2026-07-20
 
 ### Added
 
@@ -17,6 +17,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   crates.io release.
 - Crate-level and per-item docs closing every `missing_docs` gap on the
   public API surface.
+- `[package.metadata.docs.rs] all-features = true` so docs.rs renders the
+  `chrono`/`uuid`-gated items instead of just the default build.
+- A crate-level `Example` doctest mirroring the README's, now checked by
+  `cargo test --doc`.
+- CI: a GitHub Actions workflow testing the feature matrix
+  (none/default/`chrono`/`uuid`/all), `cargo fmt --check`, and
+  `cargo clippy -D warnings`.
+
+### Fixed
+
+- Fixed a broken intra-doc link (`application::UseCase` ->
+  `application::usecase::UseCase`).
+
+### Changed
+
+- Pinned `rust-version = "1.85"` (this crate's edition 2024 floor) and
+  excluded the `.github` workflow from the published package.
+
+## [0.2.0] - 2026-07-20
 
 ### Fixed
 
@@ -25,8 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   silently dropping them.
 - `testing::block_on` now times out instead of spinning forever when a
   future never completes.
-- Fixed a broken intra-doc link (`application::UseCase` ->
-  `application::usecase::UseCase`).
 
 ### Changed
 
@@ -62,6 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Poisoned mutexes in `mock` are recovered from instead of panicking forever.
 - `SystemClock` tests no longer assert wall-clock monotonicity.
 
-[Unreleased]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/ryoshrimp/ddd-toolkit-core/releases/tag/v0.1.0
