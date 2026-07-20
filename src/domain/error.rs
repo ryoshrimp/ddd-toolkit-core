@@ -1,5 +1,15 @@
 use std::{error::Error, fmt::Display};
 
+/// A validation failure for a domain value, naming the type that rejected
+/// the value and why.
+///
+/// `type_name` is a plain string, not tied to `Self` by the compiler: it is
+/// whatever the caller of [`ValidationError::new`] passes in. Derive-macro
+/// generated code always passes the exact type name it was expanded for, so
+/// it is guaranteed accurate there. A hand-written `impl` (as in this
+/// crate's own test fixtures) must keep the `type_name` argument in sync
+/// with the type by hand - copy-pasting an impl from one type to another is
+/// the most likely way for it to drift.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ValidationError {
     pub type_name: &'static str,
