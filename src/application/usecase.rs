@@ -1,5 +1,5 @@
 #[trait_variant::make(Send)]
-pub trait UseCase {
+pub trait UseCase: Send + Sync {
     type Input: Send;
     type Output: Send;
     type Error: std::error::Error + Send + Sync + 'static;
