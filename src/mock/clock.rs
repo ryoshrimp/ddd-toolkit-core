@@ -9,13 +9,13 @@ impl FixedClock {
     }
 
     pub fn set(&self, now: chrono::DateTime<chrono::Utc>) {
-        *self.0.lock().unwrap() = now;
+        *self.0.lock().unwrap_or_else(|e| e.into_inner()) = now;
     }
 }
 
 impl Clock for FixedClock {
     fn now(&self) -> chrono::DateTime<chrono::Utc> {
-        *self.0.lock().unwrap()
+        *self.0.lock().unwrap_or_else(|e| e.into_inner())
     }
 }
 
@@ -92,5 +92,22 @@ mod test {
 
         clock.set(chrono::DateTime::<chrono::Utc>::MAX_UTC);
         assert_eq!(clock.now(), chrono::DateTime::<chrono::Utc>::MAX_UTC);
+    }
+
+    // A panic while the lock is held poisons the Mutex; now()/set() must
+    // recover the guard instead of panicking forever.
+    #[test]
+    fn clock_recovers_from_poisoned_mutex() {
+        let time = utc("2026-07-19T00:00:00Z");
+        let clock = FixedClock::new(time);
+
+        let poisoned = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            let _guard = clock.0.lock().unwrap();
+            panic!("simulated panic while holding the lock");
+        }));
+        assert!(poisoned.is_err());
+        assert!(clock.0.is_poisoned());
+
+        assert_eq!(clock.now(), time);
     }
 }
