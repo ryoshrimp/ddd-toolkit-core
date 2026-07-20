@@ -13,26 +13,39 @@ impl Clock for SystemClock {
 mod test {
     use super::*;
 
-    #[test]
-    fn now_returns_time_within_before_after_window() {
-        let before = chrono::Utc::now();
-        let now = SystemClock.now();
-        let after = chrono::Utc::now();
+    // Wall-clock time (chrono::Utc::now(), which SystemClock wraps) is not
+    // guaranteed monotonic: NTP slew/step corrections can move it backward
+    // between two calls. Assert closeness to a reference instant instead of
+    // strict before/after ordering, so the test isn't flaky under clock
+    // adjustments while still catching a grossly wrong (e.g. fixed/mocked)
+    // implementation.
+    fn assert_close_to_now(
+        now: chrono::DateTime<chrono::Utc>,
+        reference: chrono::DateTime<chrono::Utc>,
+    ) {
+        let diff = (now - reference).num_milliseconds().abs();
+        assert!(
+            diff < 5_000,
+            "expected {now} to be within 5s of {reference}, was {diff}ms apart"
+        );
+    }
 
-        assert!(before <= now);
-        assert!(now <= after);
+    #[test]
+    fn now_returns_time_close_to_wall_clock() {
+        let reference = chrono::Utc::now();
+        let now = SystemClock.now();
+
+        assert_close_to_now(now, reference);
     }
 
     #[test]
     fn now_via_dyn_clock_trait_object_returns_time() {
         let clock: Box<dyn Clock> = Box::new(SystemClock);
 
-        let before = chrono::Utc::now();
+        let reference = chrono::Utc::now();
         let now = clock.now();
-        let after = chrono::Utc::now();
 
-        assert!(before <= now);
-        assert!(now <= after);
+        assert_close_to_now(now, reference);
     }
 
     #[test]
@@ -47,15 +60,12 @@ mod test {
         #[allow(clippy::clone_on_copy)]
         let cloned = original.clone();
 
-        let before = chrono::Utc::now();
+        let reference = chrono::Utc::now();
         let now_copied = copied.now();
         let now_cloned = cloned.now();
-        let after = chrono::Utc::now();
 
-        assert!(before <= now_copied);
-        assert!(now_copied <= after);
-        assert!(before <= now_cloned);
-        assert!(now_cloned <= after);
+        assert_close_to_now(now_copied, reference);
+        assert_close_to_now(now_cloned, reference);
     }
 
     #[test]
@@ -63,12 +73,10 @@ mod test {
         #[allow(clippy::default_constructed_unit_structs)]
         let clock = SystemClock::default();
 
-        let before = chrono::Utc::now();
+        let reference = chrono::Utc::now();
         let now = clock.now();
-        let after = chrono::Utc::now();
 
-        assert!(before <= now);
-        assert!(now <= after);
+        assert_close_to_now(now, reference);
     }
 
     #[test]
