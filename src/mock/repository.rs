@@ -9,27 +9,35 @@ use crate::{
 };
 
 #[derive(Debug)]
+struct StoreState<A: AggregateRoot> {
+    aggregates: HashMap<A::Id, A>,
+    events: Vec<A::Event>,
+}
+
+#[derive(Debug)]
 pub struct InMemoryStore<A: AggregateRoot> {
-    aggregates: Mutex<HashMap<A::Id, A>>,
-    events: Mutex<Vec<A::Event>>,
+    state: Mutex<StoreState<A>>,
 }
 
 impl<A: AggregateRoot> InMemoryStore<A> {
     pub fn new() -> Self {
         Self {
-            aggregates: Mutex::new(HashMap::new()),
-            events: Mutex::new(Vec::new()),
+            state: Mutex::new(StoreState {
+                aggregates: HashMap::new(),
+                events: Vec::new(),
+            }),
         }
     }
 
     pub fn take_recorded_events(&self) -> Vec<A::Event> {
-        std::mem::take(&mut *self.events.lock().unwrap_or_else(|e| e.into_inner()))
+        std::mem::take(&mut self.state.lock().unwrap_or_else(|e| e.into_inner()).events)
     }
 
     pub fn len(&self) -> usize {
-        self.aggregates
+        self.state
             .lock()
             .unwrap_or_else(|e| e.into_inner())
+            .aggregates
             .len()
     }
 
@@ -47,9 +55,10 @@ impl<A: AggregateRoot> Default for InMemoryStore<A> {
 impl<A: AggregateRoot + Clone> Load<A> for InMemoryStore<A> {
     async fn load(&self, id: &A::Id) -> Result<Option<A>, PortError> {
         Ok(self
-            .aggregates
+            .state
             .lock()
             .unwrap_or_else(|e| e.into_inner())
+            .aggregates
             .get(id)
             .cloned())
     }
@@ -57,13 +66,11 @@ impl<A: AggregateRoot + Clone> Load<A> for InMemoryStore<A> {
 
 impl<A: AggregateRoot + Clone> Save<A> for InMemoryStore<A> {
     async fn save(&self, aggregate: &mut A) -> Result<(), PortError> {
-        self.events
-            .lock()
-            .unwrap_or_else(|e| e.into_inner())
-            .extend(aggregate.take_events());
-        self.aggregates
-            .lock()
-            .unwrap_or_else(|e| e.into_inner())
+        let events = aggregate.take_events();
+        let mut state = self.state.lock().unwrap_or_else(|e| e.into_inner());
+        state.events.extend(events);
+        state
+            .aggregates
             .insert(aggregate.id().clone(), aggregate.clone());
         Ok(())
     }
@@ -71,9 +78,10 @@ impl<A: AggregateRoot + Clone> Save<A> for InMemoryStore<A> {
 
 impl<A: AggregateRoot + Clone> Delete<A> for InMemoryStore<A> {
     async fn delete(&self, id: &A::Id) -> Result<(), PortError> {
-        self.aggregates
+        self.state
             .lock()
             .unwrap_or_else(|e| e.into_inner())
+            .aggregates
             .remove(id);
         Ok(())
     }
@@ -343,20 +351,20 @@ mod test {
         assert!(result.is_ok());
     }
 
-    // A panic while any lock is held poisons that Mutex; subsequent calls
+    // A panic while the lock is held poisons the Mutex; subsequent calls
     // must recover the guard instead of panicking forever.
     #[test]
-    fn store_recovers_from_poisoned_aggregates_mutex() {
+    fn store_recovers_from_poisoned_mutex() {
         let store = InMemoryStore::new();
         let mut foo = Foo::new("foo-1", "alice");
         block_on(store.save(&mut foo)).expect("save should succeed");
 
         let poisoned = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let _guard = store.aggregates.lock().unwrap();
+            let _guard = store.state.lock().unwrap();
             panic!("simulated panic while holding the lock");
         }));
         assert!(poisoned.is_err());
-        assert!(store.aggregates.is_poisoned());
+        assert!(store.state.is_poisoned());
 
         let loaded = block_on(store.load(&FooId("foo-1".to_string())))
             .expect("load should recover from the poisoned mutex")
