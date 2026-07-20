@@ -2,6 +2,17 @@ use crate::domain::ValueObject;
 use core::str::FromStr;
 use std::fmt::Display;
 
+/// A fieldless enum treated as a closed set of named values, round-trippable
+/// through its `Display`/`FromStr` string form.
+///
+/// `variants()` and `FromStr::from_str` are independent trait items with no
+/// compiler-enforced relationship between them: nothing requires that every
+/// variant `from_str` accepts also appears in `variants()`, or vice versa.
+/// `#[derive(EnumVo)]` in `ddd-toolkit-macro` keeps them consistent by
+/// construction, generating both from the same variant list. A hand-written
+/// impl (as in this crate's own test fixtures) must keep them in sync by
+/// hand - adding, renaming, or removing a variant in one without mirroring
+/// the change in the other breaks the round-trip silently.
 pub trait EnumVo:
     ValueObject + FromStr<Err: std::error::Error + Send + Sync + 'static> + Display + Copy + 'static
 {
