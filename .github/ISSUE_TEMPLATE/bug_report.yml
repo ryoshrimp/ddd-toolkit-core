@@ -1,0 +1,42 @@
+name: Bug report
+description: Something isn't working as expected
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: >
+        A small code snippet (or link to one) that reproduces the issue.
+        This is the single most useful thing you can include.
+      render: rust
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Crate version
+      placeholder: "0.2.2"
+    validations:
+      required: true
+  - type: input
+    id: rust-version
+    attributes:
+      label: Rust version
+      description: Output of `rustc --version`
+    validations:
+      required: false
+  - type: textarea
+    id: features
+    attributes:
+      label: Enabled features
+      description: Which Cargo features are enabled (e.g. `chrono`, `uuid`)?
+    validations:
+      required: false
