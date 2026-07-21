@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-07-21
+
+### Added
+
+- `CONTRIBUTING.md` and issue templates (bug report / feature request),
+  covering dev setup, the checks CI runs, and the PR-based workflow.
+- `main` is now branch-protected: direct pushes are disabled and PRs must
+  pass CI to merge. No review is required yet (single-maintainer project).
+  Repo-only; doesn't affect the published package.
+- CI: a `coverage` job using `cargo-llvm-cov` uploads a report to Codecov;
+  added the resulting badge to the README.
+
 ## [0.2.2] - 2026-07-21
 
 ### Added
@@ -95,7 +107,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Poisoned mutexes in `mock` are recovered from instead of panicking forever.
 - `SystemClock` tests no longer assert wall-clock monotonicity.
 
-[Unreleased]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.1.0...v0.2.0
