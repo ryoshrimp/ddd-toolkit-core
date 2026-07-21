@@ -19,6 +19,7 @@ jobs:
           - ""
           - --features chrono
           - --features uuid
+          - --features serde
           - --all-features
     steps:
       - uses: actions/checkout@v4

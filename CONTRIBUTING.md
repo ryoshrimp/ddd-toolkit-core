@@ -22,6 +22,7 @@ cargo test --no-default-features
 cargo test
 cargo test --features chrono
 cargo test --features uuid
+cargo test --features serde
 cargo test --all-features
 
 cargo fmt --check

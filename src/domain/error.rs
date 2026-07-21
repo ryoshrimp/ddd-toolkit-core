@@ -11,6 +11,13 @@ use std::{error::Error, fmt::Display};
 /// with the type by hand - copy-pasting an impl from one type to another is
 /// the most likely way for it to drift.
 ///
+/// With the `serde` feature enabled, this derives `Serialize` only, not
+/// `Deserialize`: `type_name` is `&'static str`, and there is no sound way
+/// to produce a `&'static str` from arbitrary deserialized input without
+/// leaking memory. Serializing is the common need anyway (e.g. reporting a
+/// validation failure in an API error body); reconstructing one from JSON
+/// is not.
+///
 /// # Examples
 ///
 /// ```
@@ -23,6 +30,7 @@ use std::{error::Error, fmt::Display};
 /// assert_eq!(error.to_string(), "invalid Email: missing '@'");
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
 pub struct ValidationError {
     /// The name of the type that rejected the value.
     pub type_name: &'static str,
@@ -137,5 +145,16 @@ mod test {
     fn display_formats_empty_reason() {
         let ve: ValidationError = ValidationError::new("foo", "");
         assert_eq!(format!("{}", ve), "invalid foo: ")
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn serializes_to_json_object_with_type_name_and_reason_fields() {
+        let ve = ValidationError::new("Email", "missing '@'");
+        let json = serde_json::to_value(&ve).unwrap();
+        assert_eq!(
+            json,
+            serde_json::json!({"type_name": "Email", "reason": "missing '@'"})
+        );
     }
 }

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `serde` feature: derives `Serialize` for `domain::ValidationError`. Not
+  `Deserialize` - `type_name` is `&'static str`, and there is no sound way
+  to produce that from arbitrary deserialized input without leaking memory.
+
 ## [0.2.3] - 2026-07-21
 
 ### Added
