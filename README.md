@@ -3,6 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/ddd-toolkit-core.svg)](https://crates.io/crates/ddd-toolkit-core)
 [![docs.rs](https://img.shields.io/docsrs/ddd-toolkit-core)](https://docs.rs/ddd-toolkit-core)
 [![CI](https://github.com/ryoshrimp/ddd-toolkit-core/actions/workflows/ci.yml/badge.svg)](https://github.com/ryoshrimp/ddd-toolkit-core/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/ryoshrimp/ddd-toolkit-core/graph/badge.svg)](https://codecov.io/gh/ryoshrimp/ddd-toolkit-core)
 [![MSRV](https://img.shields.io/crates/msrv/ddd-toolkit-core)](Cargo.toml)
 [![license](https://img.shields.io/crates/l/ddd-toolkit-core.svg)](#license)
 
