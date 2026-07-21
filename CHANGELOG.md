@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-07-21
+
+### Added
+
+- `# Examples` sections (compiled/run as doctests) on every public trait,
+  struct, and enum outside the crate root.
+- README: crates.io/docs.rs/CI/MSRV/license badges, an `Installation`
+  section with per-feature guidance, a second example showing
+  `AggregateRoot` + `InMemoryStore` save/load, and a link to this
+  changelog.
+
+### Fixed
+
+- Moved `domain`'s module doc from an outer `///` on `lib.rs`'s `pub mod
+  domain;` into a `//!` in `domain/mod.rs`, matching every other module.
+
 ## [0.2.1] - 2026-07-20
 
 ### Added
@@ -79,7 +95,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Poisoned mutexes in `mock` are recovered from instead of panicking forever.
 - `SystemClock` tests no longer assert wall-clock monotonicity.
 
-[Unreleased]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/ryoshrimp/ddd-toolkit-core/releases/tag/v0.1.0
