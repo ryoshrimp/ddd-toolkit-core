@@ -35,10 +35,12 @@ ddd-toolkit-core = { version = "0.2", features = ["chrono", "uuid"] }
 
 - `chrono` enables `adapter::clock::SystemClock` and `mock::clock::FixedClock`.
 - `uuid` enables `adapter::id::UuidV4Generator`/`UuidV7Generator`.
+- `serde` derives `Serialize` (not `Deserialize` - see `ValidationError`'s
+  docs for why) for `domain::ValidationError`.
 
-Neither feature is required: the `domain`, `port`, `application` modules and
-the rest of `mock` build with no default features. Requires Rust 1.85 or
-newer (edition 2024).
+None of these features is required: the `domain`, `port`, `application`
+modules and the rest of `mock` build with no default features. Requires
+Rust 1.85 or newer (edition 2024).
 
 ## What's here
 
