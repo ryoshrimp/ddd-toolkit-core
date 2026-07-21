@@ -12,6 +12,11 @@ use crate::domain::EntityId;
 /// question being asked; if you do implement `PartialEq`/`Eq` for an
 /// `Entity`, implement it in terms of `is_same_as` rather than deriving it,
 /// so `==` and `is_same_as` cannot silently disagree.
+///
+/// # Examples
+///
+/// See the [crate-level example](crate) for a full walkthrough implementing
+/// `Entity` alongside [`EntityId`] and [`crate::domain::ValueObject`].
 pub trait Entity: Send + Sync {
     /// This entity's identity type.
     type Id: EntityId;

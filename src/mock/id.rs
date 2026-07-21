@@ -1,6 +1,34 @@
 use crate::{domain::EntityId, port::id::IdGenerator};
 
 /// An [`IdGenerator`] that always returns the same, fixed id.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::domain::{EntityId, ValueObject};
+/// use ddd_toolkit_core::mock::id::FixedIdGenerator;
+/// use ddd_toolkit_core::port::id::IdGenerator;
+/// use std::fmt::Display;
+///
+/// #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+/// struct OrderId(u32);
+///
+/// impl ValueObject for OrderId {}
+///
+/// impl Display for OrderId {
+///     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+///         write!(f, "order-{}", self.0)
+///     }
+/// }
+///
+/// impl EntityId for OrderId {}
+///
+/// // useful in a test that needs a predictable id to assert against
+/// let generator = FixedIdGenerator(OrderId(1));
+///
+/// assert_eq!(generator.generate(), OrderId(1));
+/// assert_eq!(generator.generate(), OrderId(1));
+/// ```
 #[derive(Debug, Clone)]
 pub struct FixedIdGenerator<Id>(pub Id);
 

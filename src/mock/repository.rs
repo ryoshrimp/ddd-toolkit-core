@@ -17,6 +17,75 @@ struct StoreState<A: AggregateRoot> {
 /// A [`Load`]/[`Save`]/[`Delete`] implementation backed by an in-memory
 /// `HashMap`, with last-write-wins semantics (see [`Save`]'s docs for what
 /// that means for `PortErrorKind::Conflict`).
+///
+/// # Examples
+///
+/// See [`Save`](Save#examples) for a worked example of saving and loading
+/// through an `InMemoryStore`. The example below covers the store's own
+/// inspection methods, useful for asserting on what a use case persisted.
+///
+/// ```
+/// use ddd_toolkit_core::domain::{AggregateRoot, DomainEvent, Entity, EntityId, ValueObject};
+/// use ddd_toolkit_core::mock::repository::InMemoryStore;
+/// use ddd_toolkit_core::port::repository::Save;
+/// use std::fmt::Display;
+///
+/// # fn block_on<F: std::future::Future>(future: F) -> F::Output {
+/// #     let mut future = std::pin::pin!(future);
+/// #     let mut cx = std::task::Context::from_waker(std::task::Waker::noop());
+/// #     loop {
+/// #         if let std::task::Poll::Ready(output) = future.as_mut().poll(&mut cx) {
+/// #             return output;
+/// #         }
+/// #     }
+/// # }
+/// #
+/// # #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+/// # struct OrderId(u32);
+/// # impl ValueObject for OrderId {}
+/// # impl Display for OrderId {
+/// #     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+/// #         write!(f, "order-{}", self.0)
+/// #     }
+/// # }
+/// # impl EntityId for OrderId {}
+/// # #[derive(Debug, Clone, PartialEq)]
+/// # struct OrderPlaced;
+/// # impl DomainEvent for OrderPlaced {}
+/// # #[derive(Debug, Clone)]
+/// # struct Order {
+/// #     id: OrderId,
+/// #     events: Vec<OrderPlaced>,
+/// # }
+/// # impl Entity for Order {
+/// #     type Id = OrderId;
+/// #     fn id(&self) -> &Self::Id {
+/// #         &self.id
+/// #     }
+/// # }
+/// # impl AggregateRoot for Order {
+/// #     type Event = OrderPlaced;
+/// #     fn record(&mut self, event: Self::Event) {
+/// #         self.events.push(event);
+/// #     }
+/// #     fn take_events(&mut self) -> Vec<Self::Event> {
+/// #         std::mem::take(&mut self.events)
+/// #     }
+/// # }
+/// let store = InMemoryStore::new();
+/// assert!(store.is_empty());
+///
+/// let mut order = Order { id: OrderId(1), events: vec![OrderPlaced] };
+/// block_on(store.save(&mut order))?;
+///
+/// assert_eq!(store.len(), 1);
+///
+/// // events recorded across every save() call so far, for asserting a use
+/// // case published what it was supposed to
+/// assert_eq!(store.take_recorded_events(), vec![OrderPlaced]);
+/// assert_eq!(store.take_recorded_events(), vec![]); // drained
+/// # Ok::<(), ddd_toolkit_core::port::PortError>(())
+/// ```
 #[derive(Debug)]
 pub struct InMemoryStore<A: AggregateRoot> {
     state: Mutex<StoreState<A>>,

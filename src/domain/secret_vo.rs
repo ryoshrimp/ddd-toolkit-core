@@ -11,6 +11,56 @@ use crate::domain::ValueObject;
 /// `ddd-toolkit-macro` closes this gap for derived types: it always
 /// generates a `Debug` impl that prints `TypeName(***)` and never the
 /// wrapped value, so prefer the derive over a manual impl wherever possible.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::domain::{SecretVo, ValidationError, ValueObject};
+/// use std::fmt::{Debug, Display};
+///
+/// #[derive(Clone, PartialEq)]
+/// struct ApiKey(String);
+///
+/// impl Display for ApiKey {
+///     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+///         write!(f, "[REDACTED]")
+///     }
+/// }
+///
+/// impl Debug for ApiKey {
+///     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+///         write!(f, "ApiKey([REDACTED])")
+///     }
+/// }
+///
+/// impl ValueObject for ApiKey {}
+///
+/// impl SecretVo for ApiKey {
+///     type Inner = String;
+///     type Error = ValidationError;
+///
+///     fn try_new(inner: Self::Inner) -> Result<Self, Self::Error> {
+///         if inner.trim().is_empty() {
+///             return Err(ValidationError::new("ApiKey", "empty"));
+///         }
+///         Ok(Self(inner))
+///     }
+///
+///     fn expose_secret(&self) -> &Self::Inner {
+///         &self.0
+///     }
+/// }
+///
+/// let key = ApiKey::try_new("sk-live-abc123".to_string())?;
+///
+/// // the raw secret is only reachable through the explicit accessor...
+/// assert_eq!(key.expose_secret(), "sk-live-abc123");
+///
+/// // ...never through Display/Debug, so it can't leak into a log by accident.
+/// assert_eq!(key.to_string(), "[REDACTED]");
+/// assert_eq!(format!("{key:?}"), "ApiKey([REDACTED])");
+/// # Ok::<(), ValidationError>(())
+/// ```
 pub trait SecretVo: ValueObject {
     /// The wrapped secret's raw type.
     type Inner;
@@ -18,6 +68,11 @@ pub trait SecretVo: ValueObject {
     type Error: std::error::Error + Send + Sync + 'static;
 
     /// Validates and wraps `inner`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretVo::Error`] if `inner` fails the implementation's
+    /// validation.
     fn try_new(inner: Self::Inner) -> Result<Self, Self::Error>;
 
     /// Returns the wrapped secret. Named to make call sites (`key.expose_secret()`

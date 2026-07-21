@@ -3,6 +3,11 @@ use std::fmt::Debug;
 /// Something that happened in the domain, recorded by an
 /// [`crate::domain::AggregateRoot`] and later published through an
 /// [`crate::port::event::EventDispatcher`].
+///
+/// # Examples
+///
+/// See [`AggregateRoot`](crate::domain::AggregateRoot#examples) for a worked
+/// example of recording and draining `DomainEvent`s.
 pub trait DomainEvent: Debug + Send + Sync + 'static {}
 
 #[cfg(test)]

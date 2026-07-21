@@ -2,6 +2,11 @@ use std::fmt::Display;
 
 /// The general category of a [`PortError`], so callers can react (e.g.
 /// retry) without inspecting the underlying error.
+///
+/// # Examples
+///
+/// See [`PortError`](PortError#examples) for a worked example of matching
+/// on a `PortErrorKind`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum PortErrorKind {
@@ -17,6 +22,24 @@ pub enum PortErrorKind {
 
 /// An error from a port implementation (repository, event dispatcher,
 /// etc.), tagged with a [`PortErrorKind`] and wrapping the underlying cause.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::port::{PortError, PortErrorKind};
+///
+/// let error = PortError::unavailable("connection refused");
+///
+/// // the kind lets a caller decide how to react, e.g. retry on `Unavailable`...
+/// match error.kind() {
+///     PortErrorKind::Unavailable => { /* retry later */ }
+///     PortErrorKind::Conflict => { /* reload and retry */ }
+///     _ => { /* give up */ }
+/// }
+///
+/// // ...while std::error::Error::source() still exposes the underlying cause.
+/// assert_eq!(error.to_string(), "Unavailable: connection refused");
+/// ```
 #[derive(Debug)]
 pub struct PortError {
     kind: PortErrorKind,

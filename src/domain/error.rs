@@ -10,6 +10,18 @@ use std::{error::Error, fmt::Display};
 /// crate's own test fixtures) must keep the `type_name` argument in sync
 /// with the type by hand - copy-pasting an impl from one type to another is
 /// the most likely way for it to drift.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::domain::ValidationError;
+///
+/// let error = ValidationError::new("Email", "missing '@'");
+///
+/// assert_eq!(error.type_name, "Email");
+/// assert_eq!(error.reason, "missing '@'");
+/// assert_eq!(error.to_string(), "invalid Email: missing '@'");
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ValidationError {
     /// The name of the type that rejected the value.

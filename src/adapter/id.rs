@@ -36,12 +36,84 @@ macro_rules! uuid_id_generator {
 
 uuid_id_generator!(
     /// Generates ids from a random (v4) UUID.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ddd_toolkit_core::adapter::id::UuidV4Generator;
+    /// use ddd_toolkit_core::domain::{EntityId, ValueObject};
+    /// use ddd_toolkit_core::port::id::IdGenerator;
+    /// use std::convert::Infallible;
+    /// use std::fmt::Display;
+    ///
+    /// #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+    /// struct OrderId(uuid::Uuid);
+    ///
+    /// impl ValueObject for OrderId {}
+    ///
+    /// impl Display for OrderId {
+    ///     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    ///         write!(f, "{}", self.0)
+    ///     }
+    /// }
+    ///
+    /// impl EntityId for OrderId {}
+    ///
+    /// impl TryFrom<uuid::Uuid> for OrderId {
+    ///     type Error = Infallible;
+    ///     fn try_from(value: uuid::Uuid) -> Result<Self, Self::Error> {
+    ///         Ok(Self(value))
+    ///     }
+    /// }
+    ///
+    /// let generator = UuidV4Generator::<OrderId>::new();
+    ///
+    /// // two calls never collide
+    /// assert_ne!(generator.generate(), generator.generate());
+    /// ```
     UuidV4Generator,
     uuid::Uuid::new_v4
 );
 
 uuid_id_generator!(
     /// Generates ids from a time-ordered (v7) UUID.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ddd_toolkit_core::adapter::id::UuidV7Generator;
+    /// use ddd_toolkit_core::domain::{EntityId, ValueObject};
+    /// use ddd_toolkit_core::port::id::IdGenerator;
+    /// use std::convert::Infallible;
+    /// use std::fmt::Display;
+    ///
+    /// #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+    /// struct OrderId(uuid::Uuid);
+    ///
+    /// impl ValueObject for OrderId {}
+    ///
+    /// impl Display for OrderId {
+    ///     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    ///         write!(f, "{}", self.0)
+    ///     }
+    /// }
+    ///
+    /// impl EntityId for OrderId {}
+    ///
+    /// impl TryFrom<uuid::Uuid> for OrderId {
+    ///     type Error = Infallible;
+    ///     fn try_from(value: uuid::Uuid) -> Result<Self, Self::Error> {
+    ///         Ok(Self(value))
+    ///     }
+    /// }
+    ///
+    /// let generator = UuidV7Generator::<OrderId>::new();
+    ///
+    /// // v7 ids are time-ordered, so ids minted later sort after earlier ones
+    /// let first = generator.generate();
+    /// let second = generator.generate();
+    /// assert!(first <= second);
+    /// ```
     UuidV7Generator,
     uuid::Uuid::now_v7
 );

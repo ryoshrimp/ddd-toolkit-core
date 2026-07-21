@@ -3,6 +3,66 @@ use crate::domain::{DomainEvent, Entity};
 /// An [`Entity`] that is a consistency boundary and the unit of persistence:
 /// changes to it (and whatever it contains) are saved and loaded together,
 /// and it records the domain events those changes produce.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::domain::{AggregateRoot, DomainEvent, Entity, EntityId, ValueObject};
+/// use std::fmt::Display;
+///
+/// #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+/// struct OrderId(u32);
+///
+/// impl ValueObject for OrderId {}
+///
+/// impl Display for OrderId {
+///     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+///         write!(f, "order-{}", self.0)
+///     }
+/// }
+///
+/// impl EntityId for OrderId {}
+///
+/// #[derive(Debug, PartialEq)]
+/// enum OrderEvent {
+///     Placed,
+/// }
+///
+/// impl DomainEvent for OrderEvent {}
+///
+/// struct Order {
+///     id: OrderId,
+///     events: Vec<OrderEvent>,
+/// }
+///
+/// impl Entity for Order {
+///     type Id = OrderId;
+///
+///     fn id(&self) -> &Self::Id {
+///         &self.id
+///     }
+/// }
+///
+/// impl AggregateRoot for Order {
+///     type Event = OrderEvent;
+///
+///     fn record(&mut self, event: Self::Event) {
+///         self.events.push(event);
+///     }
+///
+///     fn take_events(&mut self) -> Vec<Self::Event> {
+///         std::mem::take(&mut self.events)
+///     }
+/// }
+///
+/// let mut order = Order { id: OrderId(1), events: Vec::new() };
+/// order.record(OrderEvent::Placed);
+///
+/// // draining hands ownership of the recorded events to the caller (e.g. a
+/// // repository, to publish after a successful save) and clears the buffer
+/// assert_eq!(order.take_events(), vec![OrderEvent::Placed]);
+/// assert_eq!(order.take_events(), vec![]);
+/// ```
 pub trait AggregateRoot: Entity {
     /// The domain event type this aggregate records.
     type Event: DomainEvent;

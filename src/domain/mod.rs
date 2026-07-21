@@ -1,3 +1,5 @@
+//! The domain layer: entities, value objects, aggregates, and events.
+
 mod aggregate;
 mod entity;
 mod entity_id;

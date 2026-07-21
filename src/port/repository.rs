@@ -1,6 +1,11 @@
 use crate::{domain::AggregateRoot, port::PortError};
 
 /// Loads an aggregate by id.
+///
+/// # Examples
+///
+/// See [`Save`](Save#examples) for a worked example of saving and loading
+/// an aggregate.
 #[trait_variant::make(Send)]
 pub trait Load<A: AggregateRoot> {
     /// Returns the aggregate with the given id, or `None` if it doesn't exist.
@@ -8,36 +13,157 @@ pub trait Load<A: AggregateRoot> {
 }
 
 /// Persists an aggregate.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::domain::{AggregateRoot, DomainEvent, Entity, EntityId, ValueObject};
+/// use ddd_toolkit_core::mock::repository::InMemoryStore;
+/// use ddd_toolkit_core::port::repository::{Load, Save};
+/// use std::fmt::Display;
+///
+/// # fn block_on<F: std::future::Future>(future: F) -> F::Output {
+/// #     let mut future = std::pin::pin!(future);
+/// #     let mut cx = std::task::Context::from_waker(std::task::Waker::noop());
+/// #     loop {
+/// #         if let std::task::Poll::Ready(output) = future.as_mut().poll(&mut cx) {
+/// #             return output;
+/// #         }
+/// #     }
+/// # }
+/// #
+/// # #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+/// # struct OrderId(u32);
+/// # impl ValueObject for OrderId {}
+/// # impl Display for OrderId {
+/// #     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+/// #         write!(f, "order-{}", self.0)
+/// #     }
+/// # }
+/// # impl EntityId for OrderId {}
+/// # #[derive(Debug, Clone, PartialEq)]
+/// # struct OrderPlaced;
+/// # impl DomainEvent for OrderPlaced {}
+/// # #[derive(Debug, Clone)]
+/// # struct Order {
+/// #     id: OrderId,
+/// #     events: Vec<OrderPlaced>,
+/// # }
+/// # impl Entity for Order {
+/// #     type Id = OrderId;
+/// #     fn id(&self) -> &Self::Id {
+/// #         &self.id
+/// #     }
+/// # }
+/// # impl AggregateRoot for Order {
+/// #     type Event = OrderPlaced;
+/// #     fn record(&mut self, event: Self::Event) {
+/// #         self.events.push(event);
+/// #     }
+/// #     fn take_events(&mut self) -> Vec<Self::Event> {
+/// #         std::mem::take(&mut self.events)
+/// #     }
+/// # }
+/// let store = InMemoryStore::new();
+/// let mut order = Order { id: OrderId(1), events: vec![OrderPlaced] };
+///
+/// block_on(store.save(&mut order))?;
+///
+/// // save() drains the aggregate's recorded events as a side effect
+/// assert!(order.take_events().is_empty());
+///
+/// let loaded = block_on(store.load(&OrderId(1)))?.expect("just-saved order should be found");
+/// assert_eq!(loaded.id, OrderId(1));
+/// # Ok::<(), ddd_toolkit_core::port::PortError>(())
+/// ```
+///
+/// Implementations backed by optimistic concurrency control (e.g. a
+/// stored version/etag compared against the aggregate's current state)
+/// should return `Err` with [`PortErrorKind::Conflict`] when the
+/// stored version has moved on since the aggregate was loaded, so the
+/// caller can reload and retry. The in-memory reference implementations
+/// in this crate (`mock::repository::InMemoryStore` and the doctest
+/// fixtures) intentionally do not: they have no notion of a stored
+/// version and always last-write-wins, so they never produce
+/// `Conflict`. A real backend copying them as a starting point should
+/// add its own version check rather than assume last-write-wins is
+/// the port's default behavior.
+///
+/// [`PortErrorKind::Conflict`]: crate::port::PortErrorKind::Conflict
 #[trait_variant::make(Send)]
 pub trait Save<A: AggregateRoot> {
     /// Persists the aggregate, draining and recording any events it has
-    /// accumulated via [`AggregateRoot::take_events`].
-    ///
-    /// Implementations backed by optimistic concurrency control (e.g. a
-    /// stored version/etag compared against the aggregate's current state)
-    /// should return `Err` with [`PortErrorKind::Conflict`] when the
-    /// stored version has moved on since the aggregate was loaded, so the
-    /// caller can reload and retry. The in-memory reference implementations
-    /// in this crate (`mock::repository::InMemoryStore` and the doctest
-    /// fixtures) intentionally do not: they have no notion of a stored
-    /// version and always last-write-wins, so they never produce
-    /// `Conflict`. A real backend copying them as a starting point should
-    /// add its own version check rather than assume last-write-wins is
-    /// the port's default behavior.
-    ///
-    /// [`PortErrorKind::Conflict`]: crate::port::PortErrorKind::Conflict
+    /// accumulated via [`AggregateRoot::take_events`]. See the trait-level
+    /// docs for the `Conflict` contract.
     async fn save(&self, aggregate: &mut A) -> Result<(), PortError>;
 }
 
 /// Deletes an aggregate.
+///
+/// Deleting an id that does not exist is **not** an error: it is
+/// idempotent and returns `Ok(())`, the same as if the delete had just
+/// run again after already succeeding. Implementations must not return
+/// `Err` solely because the id was already absent.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::domain::{AggregateRoot, DomainEvent, Entity, EntityId, ValueObject};
+/// use ddd_toolkit_core::mock::repository::InMemoryStore;
+/// use ddd_toolkit_core::port::repository::Delete;
+/// use std::fmt::Display;
+///
+/// # fn block_on<F: std::future::Future>(future: F) -> F::Output {
+/// #     let mut future = std::pin::pin!(future);
+/// #     let mut cx = std::task::Context::from_waker(std::task::Waker::noop());
+/// #     loop {
+/// #         if let std::task::Poll::Ready(output) = future.as_mut().poll(&mut cx) {
+/// #             return output;
+/// #         }
+/// #     }
+/// # }
+/// #
+/// # #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+/// # struct OrderId(u32);
+/// # impl ValueObject for OrderId {}
+/// # impl Display for OrderId {
+/// #     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+/// #         write!(f, "order-{}", self.0)
+/// #     }
+/// # }
+/// # impl EntityId for OrderId {}
+/// # #[derive(Debug, Clone, PartialEq)]
+/// # struct OrderPlaced;
+/// # impl DomainEvent for OrderPlaced {}
+/// # #[derive(Debug, Clone)]
+/// # struct Order {
+/// #     id: OrderId,
+/// #     events: Vec<OrderPlaced>,
+/// # }
+/// # impl Entity for Order {
+/// #     type Id = OrderId;
+/// #     fn id(&self) -> &Self::Id {
+/// #         &self.id
+/// #     }
+/// # }
+/// # impl AggregateRoot for Order {
+/// #     type Event = OrderPlaced;
+/// #     fn record(&mut self, event: Self::Event) {
+/// #         self.events.push(event);
+/// #     }
+/// #     fn take_events(&mut self) -> Vec<Self::Event> {
+/// #         std::mem::take(&mut self.events)
+/// #     }
+/// # }
+/// let store = InMemoryStore::<Order>::new();
+///
+/// // deleting an id that was never there is not an error
+/// assert!(block_on(store.delete(&OrderId(404))).is_ok());
+/// ```
 #[trait_variant::make(Send)]
 pub trait Delete<A: AggregateRoot> {
-    /// Deletes the aggregate with the given id.
-    ///
-    /// Deleting an id that does not exist is **not** an error: it is
-    /// idempotent and returns `Ok(())`, the same as if the delete had just
-    /// run again after already succeeding. Implementations must not return
-    /// `Err` solely because the id was already absent.
+    /// Deletes the aggregate with the given id. See the trait-level docs
+    /// for why deleting a missing id is not an error.
     async fn delete(&self, id: &A::Id) -> Result<(), PortError>;
 }
 

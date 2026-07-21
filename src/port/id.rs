@@ -1,6 +1,46 @@
 use crate::domain::EntityId;
 
 /// Generates new [`EntityId`]s, e.g. for a new aggregate.
+///
+/// [`crate::adapter::id::UuidV4Generator`] and
+/// [`crate::adapter::id::UuidV7Generator`] generate real, unique ids;
+/// [`crate::mock::id::FixedIdGenerator`] is a test double that always
+/// returns the same configured id.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::domain::{EntityId, ValueObject};
+/// use ddd_toolkit_core::port::id::IdGenerator;
+/// use std::fmt::Display;
+/// use std::sync::atomic::{AtomicU32, Ordering};
+///
+/// #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+/// struct OrderId(u32);
+///
+/// impl ValueObject for OrderId {}
+///
+/// impl Display for OrderId {
+///     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+///         write!(f, "order-{}", self.0)
+///     }
+/// }
+///
+/// impl EntityId for OrderId {}
+///
+/// struct SequentialGenerator(AtomicU32);
+///
+/// impl IdGenerator<OrderId> for SequentialGenerator {
+///     fn generate(&self) -> OrderId {
+///         OrderId(self.0.fetch_add(1, Ordering::Relaxed))
+///     }
+/// }
+///
+/// let generator = SequentialGenerator(AtomicU32::new(1));
+///
+/// assert_eq!(generator.generate(), OrderId(1));
+/// assert_eq!(generator.generate(), OrderId(2));
+/// ```
 pub trait IdGenerator<Id: EntityId>: Send + Sync {
     /// Generates a new id.
     fn generate(&self) -> Id;

@@ -2,6 +2,24 @@ use crate::port::clock::Clock;
 
 /// A [`Clock`] that always returns a configured time until [`FixedClock::set`]
 /// changes it.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::mock::clock::FixedClock;
+/// use ddd_toolkit_core::port::clock::Clock;
+///
+/// let noon = "2026-07-21T12:00:00Z".parse().unwrap();
+/// let clock = FixedClock::new(noon);
+///
+/// // now() returns the configured instant, regardless of wall-clock time...
+/// assert_eq!(clock.now(), noon);
+///
+/// // ...until the test explicitly advances it.
+/// let evening = "2026-07-21T18:00:00Z".parse().unwrap();
+/// clock.set(evening);
+/// assert_eq!(clock.now(), evening);
+/// ```
 #[derive(Debug)]
 pub struct FixedClock(std::sync::Mutex<chrono::DateTime<chrono::Utc>>);
 

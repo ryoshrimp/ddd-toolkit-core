@@ -13,6 +13,57 @@ use std::fmt::Display;
 /// impl (as in this crate's own test fixtures) must keep them in sync by
 /// hand - adding, renaming, or removing a variant in one without mirroring
 /// the change in the other breaks the round-trip silently.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::domain::{EnumVo, ValidationError, ValueObject};
+/// use std::fmt::Display;
+/// use std::str::FromStr;
+///
+/// #[derive(Debug, Clone, Copy, PartialEq)]
+/// enum Status {
+///     Draft,
+///     Published,
+/// }
+///
+/// impl Display for Status {
+///     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+///         match self {
+///             Status::Draft => write!(f, "draft"),
+///             Status::Published => write!(f, "published"),
+///         }
+///     }
+/// }
+///
+/// impl FromStr for Status {
+///     type Err = ValidationError;
+///
+///     fn from_str(s: &str) -> Result<Self, Self::Err> {
+///         match s {
+///             "draft" => Ok(Status::Draft),
+///             "published" => Ok(Status::Published),
+///             _ => Err(ValidationError::new("Status", "unknown variant")),
+///         }
+///     }
+/// }
+///
+/// impl ValueObject for Status {}
+///
+/// impl EnumVo for Status {
+///     fn variants() -> &'static [Self] {
+///         &[Status::Draft, Status::Published]
+///     }
+/// }
+///
+/// // every variant round-trips through its string form...
+/// for status in Status::variants() {
+///     assert_eq!(status.to_string().parse(), Ok(*status));
+/// }
+///
+/// // ...and unknown strings are rejected rather than panicking.
+/// assert!("archived".parse::<Status>().is_err());
+/// ```
 pub trait EnumVo:
     ValueObject + FromStr<Err: std::error::Error + Send + Sync + 'static> + Display + Copy + 'static
 {

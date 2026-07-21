@@ -59,7 +59,6 @@
 
 pub mod adapter;
 pub mod application;
-/// The domain layer: entities, value objects, aggregates, and events.
 pub mod domain;
 pub mod mock;
 pub mod port;

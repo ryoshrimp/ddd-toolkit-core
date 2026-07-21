@@ -11,6 +11,11 @@ use crate::{domain::DomainEvent, port::PortError};
 /// delivered (typically the failing event and everything after it).
 /// Implementors that dispatch atomically (all-or-nothing) should populate
 /// it with the entire input batch on failure.
+///
+/// # Examples
+///
+/// See [`EventDispatcher`](EventDispatcher#examples) for a worked example
+/// of handling a `DispatchError`.
 #[derive(Debug)]
 pub struct DispatchError<E> {
     /// Events from the input batch that were not confirmed delivered.
@@ -47,6 +52,47 @@ impl<E: fmt::Debug> std::error::Error for DispatchError<E> {
 }
 
 /// Publishes recorded [`DomainEvent`]s, e.g. to a message broker.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::domain::DomainEvent;
+/// use ddd_toolkit_core::port::PortError;
+/// use ddd_toolkit_core::port::event::{DispatchError, EventDispatcher};
+///
+/// # fn block_on<F: std::future::Future>(future: F) -> F::Output {
+/// #     let mut future = std::pin::pin!(future);
+/// #     let mut cx = std::task::Context::from_waker(std::task::Waker::noop());
+/// #     loop {
+/// #         if let std::task::Poll::Ready(output) = future.as_mut().poll(&mut cx) {
+/// #             return output;
+/// #         }
+/// #     }
+/// # }
+/// #
+/// #[derive(Debug)]
+/// struct OrderPlaced;
+///
+/// impl DomainEvent for OrderPlaced {}
+///
+/// struct BrokenBroker;
+///
+/// impl EventDispatcher<OrderPlaced> for BrokenBroker {
+///     async fn dispatch(
+///         &self,
+///         events: Vec<OrderPlaced>,
+///     ) -> Result<(), DispatchError<OrderPlaced>> {
+///         Err(DispatchError::new(events, PortError::unavailable("broker down")))
+///     }
+/// }
+///
+/// let error = block_on(BrokenBroker.dispatch(vec![OrderPlaced]))
+///     .expect_err("broker is down, dispatch should fail");
+///
+/// // the events that weren't delivered are handed back, so the caller can
+/// // decide whether to retry them
+/// assert_eq!(error.undelivered.len(), 1);
+/// ```
 #[trait_variant::make(Send)]
 pub trait EventDispatcher<E: DomainEvent> {
     /// Dispatches `events`. See [`DispatchError`] for how partial failure

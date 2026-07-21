@@ -4,6 +4,39 @@ use std::{fmt::Display, hash::Hash};
 /// A [`ValueObject`] used as an [`crate::domain::Entity`]'s identity: always
 /// structurally comparable, hashable, orderable, and displayable, so it can
 /// be used as a map key, sorted, and printed.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::domain::{EntityId, ValueObject};
+/// use std::collections::HashMap;
+/// use std::fmt::Display;
+///
+/// #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+/// struct OrderId(u32);
+///
+/// impl ValueObject for OrderId {}
+///
+/// impl Display for OrderId {
+///     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+///         write!(f, "order-{}", self.0)
+///     }
+/// }
+///
+/// impl EntityId for OrderId {}
+///
+/// // usable as a map key...
+/// let orders: HashMap<OrderId, &str> = HashMap::from([(OrderId(1), "pending")]);
+/// assert_eq!(orders.get(&OrderId(1)), Some(&"pending"));
+///
+/// // ...sortable...
+/// let mut ids = vec![OrderId(3), OrderId(1), OrderId(2)];
+/// ids.sort();
+/// assert_eq!(ids, vec![OrderId(1), OrderId(2), OrderId(3)]);
+///
+/// // ...and printable.
+/// assert_eq!(OrderId(1).to_string(), "order-1");
+/// ```
 pub trait EntityId: ValueObject + Eq + Hash + Ord + Display {}
 
 #[cfg(test)]

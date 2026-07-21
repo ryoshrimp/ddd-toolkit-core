@@ -1,6 +1,17 @@
 use crate::port::clock::Clock;
 
 /// A [`Clock`] backed by [`chrono::Utc::now`].
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::adapter::clock::SystemClock;
+/// use ddd_toolkit_core::port::clock::Clock;
+///
+/// let clock = SystemClock;
+///
+/// assert!(clock.now() <= chrono::Utc::now());
+/// ```
 #[derive(Debug, Clone, Copy, Default)]
 pub struct SystemClock;
 

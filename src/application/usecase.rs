@@ -1,5 +1,54 @@
 /// A single, named application operation that orchestrates domain objects
 /// and ports to do one thing.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::application::usecase::UseCase;
+/// use std::fmt::Display;
+///
+/// # fn block_on<F: std::future::Future>(future: F) -> F::Output {
+/// #     let mut future = std::pin::pin!(future);
+/// #     let mut cx = std::task::Context::from_waker(std::task::Waker::noop());
+/// #     loop {
+/// #         if let std::task::Poll::Ready(output) = future.as_mut().poll(&mut cx) {
+/// #             return output;
+/// #         }
+/// #     }
+/// # }
+/// #
+/// #[derive(Debug)]
+/// struct GreetError;
+///
+/// impl Display for GreetError {
+///     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+///         write!(f, "name must not be empty")
+///     }
+/// }
+///
+/// impl std::error::Error for GreetError {}
+///
+/// struct Greet;
+///
+/// impl UseCase for Greet {
+///     type Input = String;
+///     type Output = String;
+///     type Error = GreetError;
+///
+///     async fn execute(&self, input: Self::Input) -> Result<Self::Output, Self::Error> {
+///         if input.trim().is_empty() {
+///             return Err(GreetError);
+///         }
+///         Ok(format!("hello, {input}"))
+///     }
+/// }
+///
+/// let greeting = block_on(Greet.execute("world".to_string()))?;
+/// assert_eq!(greeting, "hello, world");
+///
+/// assert!(block_on(Greet.execute(String::new())).is_err());
+/// # Ok::<(), GreetError>(())
+/// ```
 #[trait_variant::make(Send)]
 pub trait UseCase: Send + Sync {
     /// The input required to run this use case.

@@ -2,9 +2,26 @@ use std::fmt::Debug;
 
 /// A domain object with no identity, whose equality is purely structural:
 /// two value objects are the same if their data is the same.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::domain::ValueObject;
+///
+/// #[derive(Debug, Clone, PartialEq)]
+/// struct Money(u32);
+///
+/// impl ValueObject for Money {}
+///
+/// assert_eq!(Money(500), Money(500));
+/// assert_ne!(Money(500), Money(100));
+/// ```
 pub trait ValueObject: Clone + PartialEq + Debug + Send + Sync {}
 
 /// A type that wraps a single inner value.
+///
+/// Always implemented alongside [`Wrapped`]; see [`Wrapped`]'s docs for a
+/// worked example.
 pub trait WrappedInner {
     /// The wrapped type.
     type Inner;
@@ -16,6 +33,49 @@ pub trait WrappedInner {
 /// Note this invariant only holds if the wrapped field is private - see
 /// `#[derive(ValueObject)]` in `ddd-toolkit-macro`, which enforces that at
 /// derive time.
+///
+/// # Examples
+///
+/// ```
+/// use ddd_toolkit_core::domain::{ValidationError, ValueObject, Wrapped, WrappedInner};
+///
+/// #[derive(Debug, Clone, PartialEq)]
+/// struct NonEmptyString(String);
+///
+/// impl ValueObject for NonEmptyString {}
+///
+/// impl WrappedInner for NonEmptyString {
+///     type Inner = String;
+/// }
+///
+/// impl Wrapped for NonEmptyString {
+///     fn as_inner(&self) -> &Self::Inner {
+///         &self.0
+///     }
+///
+///     fn into_inner(self) -> Self::Inner {
+///         self.0
+///     }
+/// }
+///
+/// impl TryFrom<String> for NonEmptyString {
+///     type Error = ValidationError;
+///
+///     fn try_from(value: String) -> Result<Self, Self::Error> {
+///         if value.trim().is_empty() {
+///             return Err(ValidationError::new("NonEmptyString", "empty"));
+///         }
+///         Ok(Self(value))
+///     }
+/// }
+///
+/// let name: NonEmptyString = "alice".to_string().try_into()?;
+/// assert_eq!(name.as_inner(), "alice");
+/// assert_eq!(name.into_inner(), "alice".to_string());
+///
+/// assert!(NonEmptyString::try_from(String::new()).is_err());
+/// # Ok::<(), ValidationError>(())
+/// ```
 pub trait Wrapped:
     ValueObject
     + WrappedInner
