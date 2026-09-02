@@ -22,6 +22,13 @@ sourcing) compared against `src/` as of v0.3.0.
 | Event sourcing | missing |
 | Optimistic concurrency | `PortErrorKind::Conflict` exists; no version on the aggregate |
 
+Specs:
+
+- Phase A: `superpowers/specs/2026-09-03-domain-service-factory-design.md`
+- Phase B: `superpowers/specs/2026-09-03-event-envelope-versioning-design.md`
+- Phase C: `superpowers/specs/2026-09-03-cqrs-design.md`
+- Phase D: `superpowers/specs/2026-09-03-event-sourcing-design.md`
+
 ## Phase A - Domain service and factory (v0.4)
 
 Fills the last two "classic" tactical patterns. Fewest dependencies,
