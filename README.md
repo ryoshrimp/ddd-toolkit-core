@@ -45,7 +45,8 @@ Rust 1.85 or newer (edition 2024).
 ## What's here
 
 - **`domain`** - `Entity`, `AggregateRoot`, `ValueObject`/`Wrapped`,
-  `EntityId`, `SecretVo`, `EnumVo`, `DomainEvent`, `ValidationError`.
+  `EntityId`, `SecretVo`, `EnumVo`, `DomainEvent`, `DomainService`,
+  `Factory`, `ValidationError`.
 - **`port`** - `Load`/`Save`/`Delete` repository traits, `EventDispatcher`
   (with `DispatchError<E>` reporting undelivered events on partial
   failure), `Clock`, `IdGenerator`, `PortError`.

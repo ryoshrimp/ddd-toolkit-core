@@ -5,7 +5,7 @@
 //! - [`domain`] - the domain-layer traits: [`domain::Entity`],
 //!   [`domain::AggregateRoot`], [`domain::ValueObject`]/[`domain::Wrapped`],
 //!   [`domain::EntityId`], [`domain::SecretVo`], [`domain::EnumVo`],
-//!   [`domain::DomainEvent`].
+//!   [`domain::DomainEvent`], [`domain::DomainService`], [`domain::Factory`].
 //! - [`port`] - the ports a domain depends on: repository (`Load`/`Save`/
 //!   `Delete`), [`port::event::EventDispatcher`], [`port::clock::Clock`],
 //!   [`port::id::IdGenerator`].

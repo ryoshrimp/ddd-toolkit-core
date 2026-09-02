@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `domain::DomainService` - marker trait (`Send + Sync`) for stateless
+  logic that spans aggregates. Docs carry the anaemic-model warning: a
+  rule that fits one entity or value object belongs there, not in a
+  service.
+- `domain::Factory` - trait for building an aggregate/entity/value object
+  that is valid from the moment it exists (`Input`/`Output`/`Error`
+  associated types, synchronous `create`). Pairs with `ValidationError`;
+  no mock or adapter, construction is user-specific.
+
 ## [0.3.0] - 2026-07-21
 
 ### Added
