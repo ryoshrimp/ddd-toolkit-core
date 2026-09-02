@@ -7,6 +7,7 @@ mod enum_vo;
 mod error;
 mod event;
 mod secret_vo;
+mod service;
 mod vo;
 
 pub use aggregate::*;
@@ -16,4 +17,5 @@ pub use enum_vo::*;
 pub use error::*;
 pub use event::*;
 pub use secret_vo::*;
+pub use service::*;
 pub use vo::*;
