@@ -12,6 +12,7 @@
 mod aggregate_root;
 mod domain_event;
 mod entity;
+mod repository;
 mod value_object;
 
 /// **English:** Re-exports the [`aggregate_root::AggregateRoot`] trait for the crate's public API.
@@ -28,6 +29,11 @@ pub use domain_event::DomainEvent;
 ///
 /// **日本語:** [`entity::Entity`] トレイトをクレートの公開 API として再エクスポートします。
 pub use entity::Entity;
+
+/// **English:** Re-exports the [`repository::Repository`] trait for the crate's public API.
+///
+/// **日本語:** [`repository::Repository`] トレイトをクレートの公開 API として再エクスポートします。
+pub use repository::Repository;
 
 /// **English:** Re-exports the [`value_object::ValueObject`] trait for the crate's public API.
 ///
