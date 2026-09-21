@@ -9,8 +9,20 @@
 //! **日本語:** [`Entity`] は安定した識別子を参照で公開し、[`ValueObject`] は内包値を参照または
 //! 値で公開します。永続化の詳細から独立したドメイン型の API を保つために、これらのトレイトを実装します。
 
+mod aggregate_root;
+mod domain_event;
 mod entity;
 mod value_object;
+
+/// **English:** Re-exports the [`aggregate_root::AggregateRoot`] trait for the crate's public API.
+///
+/// **日本語:** [`aggregate_root::AggregateRoot`] トレイトをクレートの公開 API として再エクスポートします。
+pub use aggregate_root::AggregateRoot;
+
+/// **English:** Re-exports the [`domain_event::DomainEvent`] marker trait for the crate's public API.
+///
+/// **日本語:** [`domain_event::DomainEvent`] マーカートレイトをクレートの公開 API として再エクスポートします。
+pub use domain_event::DomainEvent;
 
 /// **English:** Re-exports the [`entity::Entity`] trait for the crate's public API.
 ///
