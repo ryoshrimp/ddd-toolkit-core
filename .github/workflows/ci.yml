@@ -17,8 +17,6 @@ jobs:
         features:
           - --no-default-features
           - ""
-          - --features chrono
-          - --features uuid
           - --features serde
           - --all-features
     steps:
