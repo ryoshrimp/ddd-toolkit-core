@@ -11,6 +11,7 @@
 
 mod aggregate_root;
 mod domain_event;
+mod domain_event_publisher;
 mod entity;
 mod repository;
 mod value_object;
@@ -24,6 +25,11 @@ pub use aggregate_root::AggregateRoot;
 ///
 /// **日本語:** [`domain_event::DomainEvent`] マーカートレイトをクレートの公開 API として再エクスポートします。
 pub use domain_event::DomainEvent;
+
+/// **English:** Re-exports the [`domain_event_publisher::DomainEventPublisher`] trait for publishing domain events.
+///
+/// **日本語:** ドメインイベントを発行する [`domain_event_publisher::DomainEventPublisher`] トレイトを再エクスポートします。
+pub use domain_event_publisher::DomainEventPublisher;
 
 /// **English:** Re-exports the [`entity::Entity`] trait for the crate's public API.
 ///
