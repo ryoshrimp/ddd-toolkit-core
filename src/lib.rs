@@ -10,6 +10,7 @@
 //! 値で公開します。永続化の詳細から独立したドメイン型の API を保つために、これらのトレイトを実装します。
 
 mod aggregate_root;
+mod dispatch;
 mod domain_event;
 mod domain_event_publisher;
 mod entity;
@@ -20,6 +21,25 @@ mod value_object;
 ///
 /// **日本語:** [`aggregate_root::AggregateRoot`] トレイトをクレートの公開 API として再エクスポートします。
 pub use aggregate_root::AggregateRoot;
+
+/// **English:** Publishes all currently pending events from an aggregate.
+///
+/// Events are published in the order returned by [`AggregateRoot::pull_events`]. If publishing any
+/// event fails, the events returned from the aggregate are recorded back into it before the error
+/// is returned. Events already accepted by the publisher are not rolled back, so retrying may
+/// publish them again. On success, the pulled events are discarded from the aggregate.
+///
+/// **日本語:** 集約に現在保留されているすべてのイベントを発行します。
+///
+/// イベントは [`AggregateRoot::pull_events`] が返した順序で発行されます。いずれかのイベントの
+/// 発行に失敗すると、集約から取り出したイベントを集約へ記録し直してからエラーを返します。
+/// パブリッシャーがすでに受理したイベントはロールバックされないため、再試行時に重複して
+/// 発行される可能性があります。成功した場合、取り出したイベントは集約から破棄されます。
+///
+/// [`dispatch_events`] は [`DomainEventPublisher::publish`] のエラーをそのまま返します。
+/// [`AggregateRoot::pull_events`] または [`AggregateRoot::record_event`] のパニック条件は、
+/// それぞれの実装に従います。
+pub use dispatch::dispatch_events;
 
 /// **English:** Re-exports the [`domain_event::DomainEvent`] marker trait for the crate's public API.
 ///
