@@ -10,6 +10,9 @@
 //! 値で公開します。永続化の詳細から独立したドメイン型の API を保つために、これらのトレイトを実装します。
 
 mod aggregate_root;
+mod async_dispatch;
+mod async_domain_event_publisher;
+mod async_repository;
 mod dispatch;
 mod domain_event;
 mod domain_event_conversion;
@@ -23,6 +26,27 @@ mod value_object;
 ///
 /// **日本語:** [`aggregate_root::AggregateRoot`] トレイトをクレートの公開 API として再エクスポートします。
 pub use aggregate_root::AggregateRoot;
+
+/// **English:** Re-exports [`async_dispatch::dispatch_events_async`] to publish aggregate events
+/// asynchronously with restoration of pulled events if publishing fails.
+///
+/// **日本語:** 発行に失敗した場合に取り出したイベントを復元しながら、集約イベントを非同期発行する
+/// [`async_dispatch::dispatch_events_async`] を再エクスポートします。
+pub use async_dispatch::dispatch_events_async;
+
+/// **English:** Re-exports [`async_domain_event_publisher::AsyncDomainEventPublisher`], the trait
+/// implemented by asynchronous domain-event publishers.
+///
+/// **日本語:** 非同期ドメインイベントパブリッシャーが実装するトレイト
+/// [`async_domain_event_publisher::AsyncDomainEventPublisher`] を再エクスポートします。
+pub use async_domain_event_publisher::AsyncDomainEventPublisher;
+
+/// **English:** Re-exports [`async_repository::AsyncRepository`], the trait for asynchronous
+/// persistence operations on aggregates.
+///
+/// **日本語:** 集約に対する非同期永続化操作のトレイト [`async_repository::AsyncRepository`] を
+/// 再エクスポートします。
+pub use async_repository::AsyncRepository;
 
 /// **English:** Publishes all currently pending events from an aggregate.
 ///
