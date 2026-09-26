@@ -12,6 +12,8 @@
 mod aggregate_root;
 mod dispatch;
 mod domain_event;
+mod domain_event_conversion;
+mod domain_event_metadata;
 mod domain_event_publisher;
 mod entity;
 mod repository;
@@ -45,6 +47,16 @@ pub use dispatch::dispatch_events;
 ///
 /// **日本語:** [`domain_event::DomainEvent`] マーカートレイトをクレートの公開 API として再エクスポートします。
 pub use domain_event::DomainEvent;
+
+/// **English:** Re-exports [`domain_event_conversion::DomainEventConversion`] for converting a domain event into another representation.
+///
+/// **日本語:** ドメインイベントを別の表現へ変換する [`domain_event_conversion::DomainEventConversion`] トレイトを再エクスポートします。
+pub use domain_event_conversion::DomainEventConversion;
+
+/// **English:** Re-exports [`domain_event_metadata::DomainEventMetadata`] for describing an event name, version, and optional metadata.
+///
+/// **日本語:** イベント名、バージョン、任意のメタデータを記述する [`domain_event_metadata::DomainEventMetadata`] トレイトを再エクスポートします。
+pub use domain_event_metadata::DomainEventMetadata;
 
 /// **English:** Re-exports the [`domain_event_publisher::DomainEventPublisher`] trait for publishing domain events.
 ///
