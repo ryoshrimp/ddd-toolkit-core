@@ -1,17 +1,7 @@
 error[E0277]: `Cell<u64>` cannot be shared between threads safely
-  --> tests/ui/cqrs_async_id_sync_api.rs:82:9
+  --> tests/ui/cqrs_async_id_sync_api.rs:98:21
    |
-82 |         <Self::Aggregate as Entity>::Id: Sync + 'a,
-   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `Cell<u64>` cannot be shared between threads safely
-   |
-   = help: the trait `Sync` is not implemented for `Cell<u64>`
-   = note: if you want to do aliasing and mutation between multiple threads, use `std::sync::RwLock` or `std::sync::atomic::AtomicU64` instead
-   = help: see issue #48214
-
-error[E0277]: `Cell<u64>` cannot be shared between threads safely
-  --> tests/ui/cqrs_async_id_sync_api.rs:99:21
-   |
-99 |     let _ = handler.handle(&id, (), Callback);
+98 |     let _ = handler.handle(&id, (), Callback);
    |                     ^^^^^^ `Cell<u64>` cannot be shared between threads safely
    |
    = help: the trait `Sync` is not implemented for `Cell<u64>`

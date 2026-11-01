@@ -79,7 +79,6 @@ impl AsyncCommandHandler for Handler {
         Self: Send + 'a,
         Self::Command: Send + 'a,
         Self::Aggregate: Send + 'a,
-        <Self::Aggregate as Entity>::Id: Sync + 'a,
         <Self::Aggregate as AggregateRoot>::Event: Send + Sync + 'a,
         Self::Repository: Send + 'a,
         <Self::Repository as AsyncRepository>::Error: Send + 'a,
