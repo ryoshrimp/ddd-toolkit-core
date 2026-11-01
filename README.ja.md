@@ -1,5 +1,12 @@
 # ddd-toolkit-core
 
+> **モノレポへ移行しました：** 今後の開発は
+> [ryoshrimp/ddd-toolkit](https://github.com/ryoshrimp/ddd-toolkit) の
+> [`crates/core`](https://github.com/ryoshrimp/ddd-toolkit/tree/main/crates/core)
+> で行います。新しいIssue・PRは移行先へお願いします。
+> このリポジトリは過去の履歴を参照するためにArchiveしています。
+> クレート名およびcrates.ioの公開済みバージョンに変更はありません。
+
 [English](README.md) | 日本語
 
 [![crates.io](https://img.shields.io/crates/v/ddd-toolkit-core.svg)](https://crates.io/crates/ddd-toolkit-core)
