@@ -1,0 +1,22 @@
+error[E0308]: mismatched types
+  --> tests/ui/event_sourcing_snapshot_error_carrier_mismatch.rs:35:12
+   |
+35 |         Ok(Err(()))
+   |         -- ^^^^^^^ expected `Option<AggregateSnapshot<u32>>`, found `Result<_, ()>`
+   |         |
+   |         arguments to this enum variant are incorrect
+   |
+   = note: expected enum `Option<AggregateSnapshot<u32>>`
+              found enum `Result<_, ()>`
+help: the type constructed contains `Result<_, ()>` due to the type of the argument passed
+  --> tests/ui/event_sourcing_snapshot_error_carrier_mismatch.rs:35:9
+   |
+35 |         Ok(Err(()))
+   |         ^^^-------^
+   |            |
+   |            this argument influences the type of `Ok`
+note: tuple variant defined here
+  --> $RUST/core/src/result.rs
+   |
+   |     Ok(#[stable(feature = "rust1", since = "1.0.0")] T),
+   |     ^^

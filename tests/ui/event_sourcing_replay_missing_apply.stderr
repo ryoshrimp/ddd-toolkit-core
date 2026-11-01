@@ -1,0 +1,15 @@
+error[E0046]: not all trait items implemented, missing: `InitializationError`, `ApplicationError`, `Snapshot`, `SnapshotValidationError`, `SnapshotStateError`, `initial_state`, `apply_event`, `classify_snapshot`, `from_snapshot`
+ --> tests/ui/event_sourcing_replay_missing_apply.rs:6:1
+  |
+6 | impl AggregateReplay for Aggregate {}
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ missing `InitializationError`, `ApplicationError`, `Snapshot`, `SnapshotValidationError`, `SnapshotStateError`, `initial_state`, `apply_event`, `classify_snapshot`, `from_snapshot` in implementation
+  |
+  = help: implement the missing item: `type InitializationError = /* Type */;`
+  = help: implement the missing item: `type ApplicationError = /* Type */;`
+  = help: implement the missing item: `type Snapshot = /* Type */;`
+  = help: implement the missing item: `type SnapshotValidationError = /* Type */;`
+  = help: implement the missing item: `type SnapshotStateError = /* Type */;`
+  = help: implement the missing item: `fn initial_state(_: &<Self as Entity>::Id) -> Result<Self, <Self as AggregateReplay>::InitializationError> { todo!() }`
+  = help: implement the missing item: `fn apply_event(&mut self, _: &<Self as AggregateRoot>::Event) -> Result<(), <Self as AggregateReplay>::ApplicationError> { todo!() }`
+  = help: implement the missing item: `fn classify_snapshot(_: &AggregateSnapshot<<Self as AggregateReplay>::Snapshot>, _: StreamRevision) -> Result<SnapshotUse, <Self as AggregateReplay>::SnapshotValidationError> { todo!() }`
+  = help: implement the missing item: `fn from_snapshot(_: &<Self as Entity>::Id, _: AggregateSnapshot<<Self as AggregateReplay>::Snapshot>) -> Result<Self, <Self as AggregateReplay>::SnapshotStateError> { todo!() }`

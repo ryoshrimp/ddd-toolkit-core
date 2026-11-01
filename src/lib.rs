@@ -8,6 +8,17 @@
 //!
 //! **日本語:** [`Entity`] は安定した識別子を参照で公開し、[`ValueObject`] は内包値を参照または
 //! 値で公開します。永続化の詳細から独立したドメイン型の API を保つために、これらのトレイトを実装します。
+//!
+//! **English:** For event-sourced aggregates, [`EventStore`] loads complete [`StreamHistory`] values
+//! and appends events using [`ExpectedRevision`]. [`AggregateReplay`] supplies reconstruction hooks
+//! for [`replay_aggregate`] and [`replay_with_optional_snapshot`]. [`SnapshotStore`] persists
+//! [`AggregateSnapshot`] values separately; adapters define storage and concurrency behavior.
+//!
+//! **日本語:** イベントソーシングを使う集約では、[`EventStore`] が完全な [`StreamHistory`] を
+//! 読み込み、[`ExpectedRevision`] を条件にイベントを追加します。[`AggregateReplay`] は
+//! [`replay_aggregate`] と [`replay_with_optional_snapshot`] の復元フックを定めます。
+//! [`SnapshotStore`] は [`AggregateSnapshot`] を別途永続化し、保存や並行処理の挙動は
+//! アダプターが定めます。
 
 mod aggregate_root;
 mod async_dispatch;
@@ -20,7 +31,10 @@ mod domain_event_conversion;
 mod domain_event_metadata;
 mod domain_event_publisher;
 mod entity;
+mod event_store;
+mod replay;
 mod repository;
+mod snapshot;
 mod value_object;
 
 /// **English:** Re-exports the [`aggregate_root::AggregateRoot`] trait for the crate's public API.
@@ -102,10 +116,32 @@ pub use domain_event_publisher::DomainEventPublisher;
 /// **日本語:** [`entity::Entity`] トレイトをクレートの公開 API として再エクスポートします。
 pub use entity::Entity;
 
+/// **English:** Re-exports event-stream storage contracts, revision checks, and validated histories.
+///
+/// **日本語:** イベントストリームの保存契約、リビジョン照合、検証済み履歴を再エクスポートします。
+pub use event_store::{
+    AppendError, AppendResult, CurrentRevision, EventStore, ExpectedRevision, LoadResult, NoStream,
+    RevisionConflict, StreamHistory, StreamHistoryError, StreamRevision,
+};
+/// **English:** Re-exports aggregate reconstruction hooks, replay helpers, results, and failure types.
+///
+/// **日本語:** 集約復元フック、再生ヘルパー、結果、失敗の型を再エクスポートします。
+pub use replay::{
+    AggregateReplay, RehydratedAggregate, ReplayError, SnapshotReplayError, replay_aggregate,
+    replay_with_optional_snapshot,
+};
+
 /// **English:** Re-exports the [`repository::Repository`] trait for the crate's public API.
 ///
 /// **日本語:** [`repository::Repository`] トレイトをクレートの公開 API として再エクスポートします。
 pub use repository::Repository;
+
+/// **English:** Re-exports snapshot state containers, classification, storage contracts, and errors.
+///
+/// **日本語:** スナップショット状態コンテナー、分類、保存契約、エラーを再エクスポートします。
+pub use snapshot::{
+    AggregateSnapshot, SnapshotLoadError, SnapshotSaveError, SnapshotStore, SnapshotUse,
+};
 
 /// **English:** Re-exports the [`value_object::ValueObject`] trait for the crate's public API.
 ///

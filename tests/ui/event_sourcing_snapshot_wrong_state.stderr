@@ -1,0 +1,13 @@
+error[E0308]: mismatched types
+  --> tests/ui/event_sourcing_snapshot_wrong_state.rs:12:178
+   |
+12 | ...shot::<Aggregate>(&1, &h, Some(AggregateSnapshot::new(String::new(), StreamRevision::new(0)))); }
+   |                                   ---------------------- ^^^^^^^^^^^^^ expected `u32`, found `String`
+   |                                   |
+   |                                   arguments to this function are incorrect
+   |
+note: associated function defined here
+  --> src/snapshot.rs
+   |
+   |     pub fn new(state: S, revision: StreamRevision) -> Self {
+   |            ^^^
