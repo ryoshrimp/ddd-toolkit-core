@@ -19,6 +19,16 @@
 //! [`replay_aggregate`] と [`replay_with_optional_snapshot`] の復元フックを定めます。
 //! [`SnapshotStore`] は [`AggregateSnapshot`] を別途永続化し、保存や並行処理の挙動は
 //! アダプターが定めます。
+//!
+//! **English:** [`Secret`] wraps a value implementing `zeroize::Zeroize`, redacts its formatted
+//! output, and zeroizes it on drop. Access to the unredacted value is explicit; extracting it
+//! transfers responsibility for zeroization to the caller. [`SecretMetadata`] is a zero-sized
+//! marker and does not itself protect data.
+//!
+//! **日本語:** [`Secret`] は `zeroize::Zeroize` を実装する値を包み、書式出力を秘匿化し、
+//! 破棄時にゼロ化します。秘匿化していない値には明示的にアクセスし、値を取り出した後の
+//! ゼロ化は呼び出し側が管理します。[`SecretMetadata`] はサイズがゼロのマーカーであり、
+//! それ自体はデータを保護しません。
 
 mod aggregate_root;
 mod async_dispatch;
@@ -34,6 +44,8 @@ mod entity;
 mod event_store;
 mod replay;
 mod repository;
+mod secret;
+mod secret_metadata;
 mod snapshot;
 mod value_object;
 
@@ -135,6 +147,16 @@ pub use replay::{
 ///
 /// **日本語:** [`repository::Repository`] トレイトをクレートの公開 API として再エクスポートします。
 pub use repository::Repository;
+
+/// **English:** Exposes [`secret::Secret`] for redacted formatting and zeroization on drop.
+///
+/// **日本語:** 書式出力の秘匿化と破棄時のゼロ化を行う [`secret::Secret`] を公開します。
+pub use secret::Secret;
+
+/// **English:** Exposes [`secret_metadata::SecretMetadata`], a marker with no stored secret value.
+///
+/// **日本語:** 秘密の値を保持しないマーカー [`secret_metadata::SecretMetadata`] を公開します。
+pub use secret_metadata::SecretMetadata;
 
 /// **English:** Re-exports snapshot state containers, classification, storage contracts, and errors.
 ///
