@@ -1,0 +1,23 @@
+error[E0616]: field `aggregate` of struct `LifecycleContext` is private
+  --> tests/ui/cqrs_context_private.rs:56:22
+   |
+56 |     let _ = &context.aggregate;
+   |                      ^^^^^^^^^ private field
+
+error[E0616]: field `repository` of struct `LifecycleContext` is private
+  --> tests/ui/cqrs_context_private.rs:57:22
+   |
+57 |     let _ = &context.repository;
+   |                      ^^^^^^^^^^ private field
+
+error[E0616]: field `publisher` of struct `LifecycleContext` is private
+  --> tests/ui/cqrs_context_private.rs:58:22
+   |
+58 |     let _ = &context.publisher;
+   |                      ^^^^^^^^^ private field
+
+error[E0616]: field `aggregate` of struct `LifecycleContext` is private
+  --> tests/ui/cqrs_context_private.rs:59:22
+   |
+59 |     let _ = &context.aggregate.events;
+   |                      ^^^^^^^^^ private field

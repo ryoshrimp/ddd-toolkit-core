@@ -1,0 +1,67 @@
+error[E0277]: `Cell<u64>` cannot be shared between threads safely
+  --> tests/ui/cqrs_async_event_sync_api.rs:44:13
+   |
+44 |     let _ = AsyncLifecycleContext::new(&mut aggregate, &mut repo, &mut publisher);
+   |             ^^^^^^^^^^^^^^^^^^^^^ `Cell<u64>` cannot be shared between threads safely
+   |
+   = help: within `Event`, the trait `Sync` is not implemented for `Cell<u64>`
+   = note: if you want to do aliasing and mutation between multiple threads, use `std::sync::RwLock` or `std::sync::atomic::AtomicU64` instead
+note: required because it appears within the type `Event`
+  --> tests/ui/cqrs_async_event_sync_api.rs:9:8
+   |
+ 9 | struct Event(Cell<u64>);
+   |        ^^^^^
+note: required by a bound in `AsyncLifecycleContext`
+  --> src/cqrs/async_query_handler.rs
+   |
+   | pub struct AsyncLifecycleContext<'storage, A, R, P>
+   |            --------------------- required by a bound in this struct
+...
+   |     A::Event: Send + Sync + 'storage,
+   |                      ^^^^ required by this bound in `AsyncLifecycleContext`
+
+error[E0277]: `Cell<u64>` cannot be shared between threads safely
+  --> tests/ui/cqrs_async_event_sync_api.rs:44:13
+   |
+44 |     let _ = AsyncLifecycleContext::new(&mut aggregate, &mut repo, &mut publisher);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `Cell<u64>` cannot be shared between threads safely
+   |
+   = help: within `Event`, the trait `Sync` is not implemented for `Cell<u64>`
+   = note: if you want to do aliasing and mutation between multiple threads, use `std::sync::RwLock` or `std::sync::atomic::AtomicU64` instead
+note: required because it appears within the type `Event`
+  --> tests/ui/cqrs_async_event_sync_api.rs:9:8
+   |
+ 9 | struct Event(Cell<u64>);
+   |        ^^^^^
+note: required by a bound in `AsyncLifecycleContext`
+  --> src/cqrs/async_query_handler.rs
+   |
+   | pub struct AsyncLifecycleContext<'storage, A, R, P>
+   |            --------------------- required by a bound in this struct
+...
+   |     A::Event: Send + Sync + 'storage,
+   |                      ^^^^ required by this bound in `AsyncLifecycleContext`
+
+error[E0277]: `Cell<u64>` cannot be shared between threads safely
+  --> tests/ui/cqrs_async_event_sync_api.rs:45:35
+   |
+45 |     let _ = dispatch_events_async(&mut aggregate, &mut publisher);
+   |             --------------------- ^^^^^^^^^^^^^^ `Cell<u64>` cannot be shared between threads safely
+   |             |
+   |             required by a bound introduced by this call
+   |
+   = help: within `Event`, the trait `Sync` is not implemented for `Cell<u64>`
+   = note: if you want to do aliasing and mutation between multiple threads, use `std::sync::RwLock` or `std::sync::atomic::AtomicU64` instead
+note: required because it appears within the type `Event`
+  --> tests/ui/cqrs_async_event_sync_api.rs:9:8
+   |
+ 9 | struct Event(Cell<u64>);
+   |        ^^^^^
+note: required by a bound in `dispatch_events_async`
+  --> src/async_dispatch.rs
+   |
+   | pub fn dispatch_events_async<'a, A, P>(
+   |        --------------------- required by a bound in this function
+...
+   |     A::Event: Send + Sync + 'a,
+   |                      ^^^^ required by this bound in `dispatch_events_async`

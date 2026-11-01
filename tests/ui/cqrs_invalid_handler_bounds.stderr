@@ -1,0 +1,128 @@
+error[E0277]: the trait bound `NotAnAggregate: AggregateRoot` is not satisfied
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:20:22
+   |
+20 |     type Aggregate = NotAnAggregate;
+   |                      ^^^^^^^^^^^^^^ unsatisfied trait bound
+   |
+help: the trait `AggregateRoot` is not implemented for `NotAnAggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:17:1
+   |
+17 | struct NotAnAggregate;
+   | ^^^^^^^^^^^^^^^^^^^^^
+help: the trait `AggregateRoot` is implemented for `Aggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:11:1
+   |
+11 | impl AggregateRoot for Aggregate {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: required by a bound in `ddd_toolkit_core::Repository::Aggregate`
+  --> src/repository.rs
+   |
+   |     type Aggregate: AggregateRoot;
+   |                     ^^^^^^^^^^^^^ required by this bound in `Repository::Aggregate`
+
+error[E0277]: the trait bound `NotAnAggregate: Entity` is not satisfied
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:22:5
+   |
+22 |     fn find_by_id(&self, _: &u64) -> Result<Option<NotAnAggregate>, ()> { Ok(None) }
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+   |
+help: the trait `Entity` is not implemented for `NotAnAggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:17:1
+   |
+17 | struct NotAnAggregate;
+   | ^^^^^^^^^^^^^^^^^^^^^
+help: the trait `Entity` is implemented for `Aggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:7:1
+   |
+ 7 | impl Entity for Aggregate {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0277]: the trait bound `NotAnAggregate: Entity` is not satisfied
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:24:5
+   |
+24 |     fn delete(&mut self, _: &u64) -> Result<(), ()> { Ok(()) }
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+   |
+help: the trait `Entity` is not implemented for `NotAnAggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:17:1
+   |
+17 | struct NotAnAggregate;
+   | ^^^^^^^^^^^^^^^^^^^^^
+help: the trait `Entity` is implemented for `Aggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:7:1
+   |
+ 7 | impl Entity for Aggregate {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0277]: the trait bound `NotAnAggregate: Entity` is not satisfied
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:25:5
+   |
+25 |     fn exists(&self, _: &u64) -> Result<bool, ()> { Ok(false) }
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+   |
+help: the trait `Entity` is not implemented for `NotAnAggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:17:1
+   |
+17 | struct NotAnAggregate;
+   | ^^^^^^^^^^^^^^^^^^^^^
+help: the trait `Entity` is implemented for `Aggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:7:1
+   |
+ 7 | impl Entity for Aggregate {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0277]: the trait bound `NotAnAggregate: AggregateRoot` is not satisfied
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:37:22
+   |
+37 |     type Aggregate = NotAnAggregate;
+   |                      ^^^^^^^^^^^^^^ unsatisfied trait bound
+   |
+help: the trait `AggregateRoot` is not implemented for `NotAnAggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:17:1
+   |
+17 | struct NotAnAggregate;
+   | ^^^^^^^^^^^^^^^^^^^^^
+help: the trait `AggregateRoot` is implemented for `Aggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:11:1
+   |
+11 | impl AggregateRoot for Aggregate {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: required by a bound in `ddd_toolkit_core::CommandHandler::Aggregate`
+  --> src/cqrs/query_handler.rs
+   |
+   |     type Aggregate: AggregateRoot;
+   |                     ^^^^^^^^^^^^^ required by this bound in `CommandHandler::Aggregate`
+
+error[E0277]: the trait bound `NotAnAggregate: AggregateRoot` is not satisfied
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:39:22
+   |
+39 |     type Publisher = Publisher;
+   |                      ^^^^^^^^^ unsatisfied trait bound
+   |
+help: the trait `AggregateRoot` is not implemented for `NotAnAggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:17:1
+   |
+17 | struct NotAnAggregate;
+   | ^^^^^^^^^^^^^^^^^^^^^
+help: the trait `AggregateRoot` is implemented for `Aggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:11:1
+   |
+11 | impl AggregateRoot for Aggregate {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0277]: the trait bound `NotAnAggregate: Entity` is not satisfied
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:42:5
+   |
+42 |     fn handle<F>(&mut self, _: &u64, _: (), _: F) -> Result<(), ()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+   |
+help: the trait `Entity` is not implemented for `NotAnAggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:17:1
+   |
+17 | struct NotAnAggregate;
+   | ^^^^^^^^^^^^^^^^^^^^^
+help: the trait `Entity` is implemented for `Aggregate`
+  --> tests/ui/cqrs_invalid_handler_bounds.rs:7:1
+   |
+ 7 | impl Entity for Aggregate {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^

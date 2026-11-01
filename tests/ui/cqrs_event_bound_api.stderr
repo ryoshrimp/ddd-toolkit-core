@@ -1,0 +1,16 @@
+error[E0271]: type mismatch resolving `<WrongPublisher as DomainEventPublisher>::Event == EventA`
+  --> tests/ui/cqrs_event_bound_api.rs:40:22
+   |
+40 |     type Publisher = WrongPublisher;
+   |                      ^^^^^^^^^^^^^^ type mismatch resolving `<WrongPublisher as DomainEventPublisher>::Event == EventA`
+   |
+note: expected this to be `EventA`
+  --> tests/ui/cqrs_event_bound_api.rs:30:18
+   |
+30 |     type Event = EventB;
+   |                  ^^^^^^
+note: required by a bound in `ddd_toolkit_core::CommandHandler::Publisher`
+  --> src/cqrs/query_handler.rs
+   |
+   |     type Publisher: DomainEventPublisher<Event = <Self::Aggregate as AggregateRoot>::Event>;
+   |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `CommandHandler::Publisher`
