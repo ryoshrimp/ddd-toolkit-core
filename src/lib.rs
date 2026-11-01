@@ -43,6 +43,14 @@
 //! [`AsyncProjection`] も提供します。[`DomainEventDeliveryMetadata`] は任意で
 //! [`DeliveryMetadata`] を公開します。[`TransactionalOutbox`] は保存・登録、取得、確認応答を
 //! 分離します。トランザクションと配信方針はこのクレートではなくアダプターが提供します。
+//!
+//! **English:** [`TransactionalOutboxLifecycleContext`] tracks a single save-and-enqueue attempt.
+//! It pulls pending events without restoring them on failure, rejects repeated attempts, and
+//! reports missing or unsuccessful enqueueing at completion. It does not implement a transaction.
+//!
+//! **日本語:** [`TransactionalOutboxLifecycleContext`] は保存・登録の一回の試行を追跡します。
+//! 保留イベントを取り出して失敗時も復元せず、繰り返しの試行を拒否し、完了確認時に
+//! 未試行や未成功を報告します。トランザクション自体は実装しません。
 
 mod aggregate_root;
 mod async_dispatch;
@@ -61,6 +69,7 @@ mod entity;
 mod event_consumption;
 mod event_delivery_metadata;
 mod event_store;
+mod outbox_lifecycle;
 mod replay;
 mod repository;
 mod secret;
@@ -180,6 +189,16 @@ pub use event_store::{
     AppendError, AppendResult, CurrentRevision, EventStore, ExpectedRevision, LoadResult, NoStream,
     RevisionConflict, StreamHistory, StreamHistoryError, StreamRevision,
 };
+
+/// **English:** Exposes the single-attempt outbox lifecycle context, its errors, and their short aliases.
+///
+/// **日本語:** 一回のみ試行するアウトボックスのライフサイクルコンテキスト、エラー、短い別名を公開します。
+pub use outbox_lifecycle::{
+    OutboxLifecycleCompletionError, OutboxLifecycleContext, OutboxLifecycleOperationError,
+    TransactionalOutboxCompletionError, TransactionalOutboxLifecycleContext,
+    TransactionalOutboxOperationError,
+};
+
 /// **English:** Re-exports aggregate reconstruction hooks, replay helpers, results, and failure types.
 ///
 /// **日本語:** 集約復元フック、再生ヘルパー、結果、失敗の型を再エクスポートします。
