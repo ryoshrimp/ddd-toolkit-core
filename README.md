@@ -1,5 +1,12 @@
 # ddd-toolkit-core
 
+> **Moved to the monorepo:** Development now takes place in
+> [ryoshrimp/ddd-toolkit](https://github.com/ryoshrimp/ddd-toolkit), under
+> [`crates/core`](https://github.com/ryoshrimp/ddd-toolkit/tree/main/crates/core).
+> Please open new issues and pull requests in the monorepo.
+> This repository is archived for historical reference. The crate name and
+> existing releases on crates.io are unchanged.
+
 English | [日本語](README.ja.md)
 
 [![crates.io](https://img.shields.io/crates/v/ddd-toolkit-core.svg)](https://crates.io/crates/ddd-toolkit-core)
