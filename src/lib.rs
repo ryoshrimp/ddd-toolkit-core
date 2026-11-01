@@ -29,11 +29,28 @@
 //! 破棄時にゼロ化します。秘匿化していない値には明示的にアクセスし、値を取り出した後の
 //! ゼロ化は呼び出し側が管理します。[`SecretMetadata`] はサイズがゼロのマーカーであり、
 //! それ自体はデータを保護しません。
+//!
+//! **English:** [`AsyncEventStore`] and [`AsyncSnapshotStore`] expose boxed `Send` futures for
+//! event and snapshot persistence. [`EventConsumer`] and [`Projection`] separate event handling
+//! from read-model updates, with asynchronous counterparts [`AsyncEventConsumer`] and
+//! [`AsyncProjection`]. [`DomainEventDeliveryMetadata`] optionally exposes [`DeliveryMetadata`].
+//! [`TransactionalOutbox`] separates save-and-enqueue, claim, and acknowledgement operations;
+//! adapters supply transactions and delivery policies, not this crate.
+//!
+//! **日本語:** [`AsyncEventStore`] と [`AsyncSnapshotStore`] はイベントとスナップショットの
+//! 永続化を、ボックス化された `Send` Future で公開します。[`EventConsumer`] と [`Projection`]
+//! はイベント処理と読み取りモデル更新を分け、非同期版の [`AsyncEventConsumer`] と
+//! [`AsyncProjection`] も提供します。[`DomainEventDeliveryMetadata`] は任意で
+//! [`DeliveryMetadata`] を公開します。[`TransactionalOutbox`] は保存・登録、取得、確認応答を
+//! 分離します。トランザクションと配信方針はこのクレートではなくアダプターが提供します。
 
 mod aggregate_root;
 mod async_dispatch;
 mod async_domain_event_publisher;
+mod async_event_consumption;
+mod async_event_store;
 mod async_repository;
+mod async_snapshot;
 mod cqrs;
 mod dispatch;
 mod domain_event;
@@ -41,12 +58,15 @@ mod domain_event_conversion;
 mod domain_event_metadata;
 mod domain_event_publisher;
 mod entity;
+mod event_consumption;
+mod event_delivery_metadata;
 mod event_store;
 mod replay;
 mod repository;
 mod secret;
 mod secret_metadata;
 mod snapshot;
+mod transactional_outbox;
 mod value_object;
 
 /// **English:** Re-exports the [`aggregate_root::AggregateRoot`] trait for the crate's public API.
@@ -68,12 +88,27 @@ pub use async_dispatch::dispatch_events_async;
 /// [`async_domain_event_publisher::AsyncDomainEventPublisher`] を再エクスポートします。
 pub use async_domain_event_publisher::AsyncDomainEventPublisher;
 
+/// **English:** Exposes asynchronous event handling and read-model update ports.
+///
+/// **日本語:** 非同期イベント処理と読み取りモデル更新のポートを公開します。
+pub use async_event_consumption::{AsyncEventConsumer, AsyncProjection};
+
+/// **English:** Exposes [`async_event_store::AsyncEventStore`] for future-based event persistence.
+///
+/// **日本語:** Future によるイベント永続化の [`async_event_store::AsyncEventStore`] を公開します。
+pub use async_event_store::AsyncEventStore;
+
 /// **English:** Re-exports [`async_repository::AsyncRepository`], the trait for asynchronous
 /// persistence operations on aggregates.
 ///
 /// **日本語:** 集約に対する非同期永続化操作のトレイト [`async_repository::AsyncRepository`] を
 /// 再エクスポートします。
 pub use async_repository::AsyncRepository;
+
+/// **English:** Exposes [`async_snapshot::AsyncSnapshotStore`] for asynchronous snapshot storage.
+///
+/// **日本語:** 非同期スナップショット保存の [`async_snapshot::AsyncSnapshotStore`] を公開します。
+pub use async_snapshot::AsyncSnapshotStore;
 
 /// **English:** Re-exports synchronous and asynchronous CQRS handlers, aggregate creators, and lifecycle APIs.
 ///
@@ -128,6 +163,16 @@ pub use domain_event_publisher::DomainEventPublisher;
 /// **日本語:** [`entity::Entity`] トレイトをクレートの公開 API として再エクスポートします。
 pub use entity::Entity;
 
+/// **English:** Exposes synchronous event consumption and projection update contracts.
+///
+/// **日本語:** 同期イベント処理とプロジェクション更新の契約を公開します。
+pub use event_consumption::{EventConsumer, Projection};
+
+/// **English:** Exposes delivery identifier containers and opt-in metadata access for events.
+///
+/// **日本語:** 配信識別子のコンテナーとイベントの任意メタデータアクセスを公開します。
+pub use event_delivery_metadata::{DeliveryMetadata, DomainEventDeliveryMetadata};
+
 /// **English:** Re-exports event-stream storage contracts, revision checks, and validated histories.
 ///
 /// **日本語:** イベントストリームの保存契約、リビジョン照合、検証済み履歴を再エクスポートします。
@@ -164,6 +209,11 @@ pub use secret_metadata::SecretMetadata;
 pub use snapshot::{
     AggregateSnapshot, SnapshotLoadError, SnapshotSaveError, SnapshotStore, SnapshotUse,
 };
+
+/// **English:** Exposes the outbox persistence port, owned claims, and acknowledgement identifiers.
+///
+/// **日本語:** アウトボックス永続化ポート、所有された取得結果、確認応答用の識別子を公開します。
+pub use transactional_outbox::{OutboxClaim, OutboxMessageId, TransactionalOutbox};
 
 /// **English:** Re-exports the [`value_object::ValueObject`] trait for the crate's public API.
 ///
