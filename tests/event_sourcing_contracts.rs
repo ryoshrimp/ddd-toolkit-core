@@ -1,8 +1,8 @@
 use ddd_toolkit_core::{
-    replay_aggregate, replay_with_optional_snapshot, AggregateReplay, AggregateRoot, AppendError,
-    AppendResult, CurrentRevision, DomainEvent, Entity, EventStore, ExpectedRevision, LoadResult,
-    NoStream, ReplayError, SnapshotReplayError, SnapshotUse, StreamHistory, StreamHistoryError,
-    StreamRevision,
+    AggregateReplay, AggregateRoot, AppendError, AppendResult, CurrentRevision, DomainEvent,
+    Entity, EventStore, ExpectedRevision, LoadResult, NoStream, ReplayError, SnapshotReplayError,
+    SnapshotUse, StreamHistory, StreamHistoryError, StreamRevision, replay_aggregate,
+    replay_with_optional_snapshot,
 };
 use std::cell::Cell;
 use std::collections::HashMap;
@@ -344,7 +344,10 @@ fn optional_snapshot_replays_suffix_and_distinguishes_failures() {
     let final_snapshot = replay_with_optional_snapshot::<Aggregate>(
         &1,
         &history(vec![Event(1), Event(2)]),
-        Some(ddd_toolkit_core::AggregateSnapshot::new(10, StreamRevision::new(1))),
+        Some(ddd_toolkit_core::AggregateSnapshot::new(
+            10,
+            StreamRevision::new(1),
+        )),
     )
     .unwrap();
     assert_eq!(final_snapshot.aggregate.value, 10);
@@ -356,7 +359,10 @@ fn optional_snapshot_replays_suffix_and_distinguishes_failures() {
         replay_with_optional_snapshot::<Aggregate>(
             &1,
             &history(vec![Event(1)]),
-            Some(ddd_toolkit_core::AggregateSnapshot::new(42, StreamRevision::new(1)))
+            Some(ddd_toolkit_core::AggregateSnapshot::new(
+                42,
+                StreamRevision::new(1)
+            ))
         )
         .unwrap_err(),
         SnapshotReplayError::SnapshotRevision {
@@ -369,7 +375,10 @@ fn optional_snapshot_replays_suffix_and_distinguishes_failures() {
         replay_with_optional_snapshot::<Aggregate>(
             &1,
             &history(vec![Event(1)]),
-            Some(ddd_toolkit_core::AggregateSnapshot::new(-1, StreamRevision::new(0)))
+            Some(ddd_toolkit_core::AggregateSnapshot::new(
+                -1,
+                StreamRevision::new(0)
+            ))
         )
         .unwrap_err(),
         SnapshotReplayError::SnapshotValidation("invalid")
@@ -378,7 +387,10 @@ fn optional_snapshot_replays_suffix_and_distinguishes_failures() {
         replay_with_optional_snapshot::<Aggregate>(
             &1,
             &history(vec![Event(1)]),
-            Some(ddd_toolkit_core::AggregateSnapshot::new(-2, StreamRevision::new(0)))
+            Some(ddd_toolkit_core::AggregateSnapshot::new(
+                -2,
+                StreamRevision::new(0)
+            ))
         )
         .unwrap_err(),
         SnapshotReplayError::SnapshotState("state")
