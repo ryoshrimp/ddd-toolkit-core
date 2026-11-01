@@ -27,9 +27,9 @@ where
     R: Repository<Aggregate = A>,
     P: DomainEventPublisher<Event = A::Event>,
 {
-/// **English:** Creates a lifecycle context borrowing the aggregate, repository, and publisher mutably.
-///
-/// **日本語:** 集約、リポジトリ、パブリッシャーを可変借用するライフサイクルコンテキストを作成します。
+    /// **English:** Creates a lifecycle context borrowing the aggregate, repository, and publisher mutably.
+    ///
+    /// **日本語:** 集約、リポジトリ、パブリッシャーを可変借用するライフサイクルコンテキストを作成します。
     pub fn new(aggregate: &'a mut A, repository: &'a mut R, publisher: &'a mut P) -> Self {
         Self {
             aggregate,
@@ -40,9 +40,9 @@ where
         }
     }
 
-/// **English:** Attempts repository persistence once; adapter errors are returned and the attempt cannot be retried.
-///
-/// **日本語:** リポジトリへの保存を一度試行します。アダプターエラーを返し、再試行はできません。
+    /// **English:** Attempts repository persistence once; adapter errors are returned and the attempt cannot be retried.
+    ///
+    /// **日本語:** リポジトリへの保存を一度試行します。アダプターエラーを返し、再試行はできません。
     pub fn save(&mut self) -> Result<(), LifecycleOperationError<R::Error>> {
         if self.save_state != OperationState::Pending {
             return Err(LifecycleOperationError::AlreadySaved);
@@ -57,9 +57,9 @@ where
         }
     }
 
-/// **English:** Attempts event dispatch once; adapter errors are returned and the attempt cannot be retried.
-///
-/// **日本語:** イベント配信を一度試行します。アダプターエラーを返し、再試行はできません。
+    /// **English:** Attempts event dispatch once; adapter errors are returned and the attempt cannot be retried.
+    ///
+    /// **日本語:** イベント配信を一度試行します。アダプターエラーを返し、再試行はできません。
     pub fn dispatch(&mut self) -> Result<(), LifecycleOperationError<P::Error>> {
         if self.dispatch_state != OperationState::Pending {
             return Err(LifecycleOperationError::AlreadyDispatched);
@@ -74,9 +74,9 @@ where
         }
     }
 
-/// **English:** Consumes the context and succeeds only when both save and dispatch succeeded.
-///
-/// **日本語:** コンテキストを消費し、保存と配信の両方が成功した場合にのみ成功します。
+    /// **English:** Consumes the context and succeeds only when both save and dispatch succeeded.
+    ///
+    /// **日本語:** コンテキストを消費し、保存と配信の両方が成功した場合にのみ成功します。
     pub fn complete(self) -> Result<(), LifecycleCompletionError> {
         match (self.save_state, self.dispatch_state) {
             (OperationState::Succeeded, OperationState::Succeeded) => Ok(()),

@@ -62,9 +62,9 @@ where
     R::Error: Send + 'storage,
     P::Error: Send + 'storage,
 {
-/// **English:** Creates a lifecycle context borrowing the aggregate, repository, and publisher mutably.
-///
-/// **日本語:** 集約、リポジトリ、パブリッシャーを可変借用するライフサイクルコンテキストを作成します。
+    /// **English:** Creates a lifecycle context borrowing the aggregate, repository, and publisher mutably.
+    ///
+    /// **日本語:** 集約、リポジトリ、パブリッシャーを可変借用するライフサイクルコンテキストを作成します。
     pub fn new(
         aggregate: &'storage mut A,
         repository: &'storage mut R,
@@ -79,9 +79,9 @@ where
         }
     }
 
-/// **English:** Attempts repository persistence once; adapter errors are returned and the attempt cannot be retried.
-///
-/// **日本語:** リポジトリへの保存を一度試行します。アダプターエラーを返し、再試行はできません。
+    /// **English:** Attempts repository persistence once; adapter errors are returned and the attempt cannot be retried.
+    ///
+    /// **日本語:** リポジトリへの保存を一度試行します。アダプターエラーを返し、再試行はできません。
     pub fn save<'ctx>(
         &'ctx mut self,
     ) -> Pin<Box<dyn Future<Output = Result<(), LifecycleOperationError<R::Error>>> + Send + 'ctx>>
@@ -110,9 +110,9 @@ where
         })
     }
 
-/// **English:** Attempts event dispatch once; adapter errors are returned and the attempt cannot be retried.
-///
-/// **日本語:** イベント配信を一度試行します。アダプターエラーを返し、再試行はできません。
+    /// **English:** Attempts event dispatch once; adapter errors are returned and the attempt cannot be retried.
+    ///
+    /// **日本語:** イベント配信を一度試行します。アダプターエラーを返し、再試行はできません。
     pub fn dispatch<'ctx>(
         &'ctx mut self,
     ) -> Pin<Box<dyn Future<Output = Result<(), LifecycleOperationError<P::Error>>> + Send + 'ctx>>
@@ -143,9 +143,9 @@ where
         })
     }
 
-/// **English:** Consumes the context and succeeds only when both save and dispatch succeeded.
-///
-/// **日本語:** コンテキストを消費し、保存と配信の両方が成功した場合にのみ成功します。
+    /// **English:** Consumes the context and succeeds only when both save and dispatch succeeded.
+    ///
+    /// **日本語:** コンテキストを消費し、保存と配信の両方が成功した場合にのみ成功します。
     pub fn complete(self) -> Result<(), LifecycleCompletionError> {
         match (self.save_state, self.dispatch_state) {
             (OperationState::Succeeded, OperationState::Succeeded) => Ok(()),
