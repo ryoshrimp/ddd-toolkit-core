@@ -66,6 +66,24 @@
 //! [`ProjectionApplication`] で報告します。重複検出と、チェックポイント永続化・読み取りモデル変更の
 //! 連携は実装が提供します。
 
+//!
+//! **English:** [`Specification`] composes fallible predicates with short-circuiting [`And`],
+//! [`Or`], and [`Not`]. [`DomainService`], [`Policy`], and [`DomainFactory`] define typed operation,
+//! rule-checking, and construction boundaries without prescribing persistence or thread safety.
+//! [`ProcessManager`] returns a [`Transition`] of state and effect descriptions for callers to
+//! store and execute. [`UnitOfWork`] exposes explicit registration, commit, and rollback ports;
+//! implementations define their transaction guarantees. [`EventIdentity`] and [`VersionedEvent`]
+//! describe event schemas, while [`UpcasterChain`] applies [`EventUpcaster`] stages in insertion
+//! order without automatically selecting versions.
+//!
+//! **日本語:** [`Specification`] は失敗し得る述語を、短絡評価する [`And`]、[`Or`]、[`Not`] で
+//! 結合します。[`DomainService`]、[`Policy`]、[`DomainFactory`] は永続化やスレッド安全性を
+//! 規定せず、型付きの操作、規則確認、構築の境界を定めます。[`ProcessManager`] は状態と
+//! 副作用の記述を [`Transition`] で返し、保存と実行は呼び出し側が担います。[`UnitOfWork`] は
+//! 明示的な登録、コミット、ロールバックのポートであり、トランザクションの保証は実装が定めます。
+//! [`EventIdentity`] と [`VersionedEvent`] はイベントのスキーマを表し、[`UpcasterChain`] は
+//! バージョンを自動選択せず、[`EventUpcaster`] の段階を追加順に適用します。
+
 mod aggregate_root;
 mod async_dispatch;
 mod async_domain_event_publisher;
@@ -81,18 +99,24 @@ mod domain_event;
 mod domain_event_conversion;
 mod domain_event_metadata;
 mod domain_event_publisher;
+mod domain_factory;
+mod domain_service;
 mod entity;
 mod event_consumption;
 mod event_delivery_metadata;
 mod event_store;
+mod event_versioning;
 mod outbox_lifecycle;
+mod process_manager;
 mod projection_reliability;
 mod replay;
 mod repository;
 mod secret;
 mod secret_metadata;
 mod snapshot;
+mod specification;
 mod transactional_outbox;
+mod unit_of_work;
 mod value_object;
 
 /// **English:** Re-exports the [`aggregate_root::AggregateRoot`] trait for the crate's public API.
@@ -198,6 +222,16 @@ pub use domain_event_metadata::DomainEventMetadata;
 /// **日本語:** ドメインイベントを発行する [`domain_event_publisher::DomainEventPublisher`] トレイトを再エクスポートします。
 pub use domain_event_publisher::DomainEventPublisher;
 
+/// **English:** Exposes [`domain_factory::DomainFactory`] for fallible construction from owned input.
+///
+/// **日本語:** 所有する入力からの失敗し得る構築に使う [`domain_factory::DomainFactory`] を公開します。
+pub use domain_factory::DomainFactory;
+
+/// **English:** Exposes typed domain operations and borrowed-context policy checks.
+///
+/// **日本語:** 型付きのドメイン操作と、コンテキストを借用するポリシー確認を公開します。
+pub use domain_service::{DomainService, Policy};
+
 /// **English:** Re-exports the [`entity::Entity`] trait for the crate's public API.
 ///
 /// **日本語:** [`entity::Entity`] トレイトをクレートの公開 API として再エクスポートします。
@@ -221,6 +255,11 @@ pub use event_store::{
     RevisionConflict, StreamHistory, StreamHistoryError, StreamRevision,
 };
 
+/// **English:** Exposes event schema identities and insertion-ordered, fallible upcasting stages.
+///
+/// **日本語:** イベントのスキーマ識別情報と、追加順の失敗し得る変換段階を公開します。
+pub use event_versioning::{EventIdentity, EventUpcaster, UpcasterChain, VersionedEvent};
+
 /// **English:** Exposes the single-attempt outbox lifecycle context, its errors, and their short aliases.
 ///
 /// **日本語:** 一回のみ試行するアウトボックスのライフサイクルコンテキスト、エラー、短い別名を公開します。
@@ -229,6 +268,11 @@ pub use outbox_lifecycle::{
     TransactionalOutboxCompletionError, TransactionalOutboxLifecycleContext,
     TransactionalOutboxOperationError,
 };
+
+/// **English:** Exposes process transition computation and owned state/effect results.
+///
+/// **日本語:** プロセスの遷移計算と、所有された状態・副作用の結果を公開します。
+pub use process_manager::{ProcessManager, Transition};
 
 /// **English:** Exposes typed projection progress, checkpoint storage, and duplicate-aware application contracts.
 ///
@@ -267,10 +311,20 @@ pub use snapshot::{
     AggregateSnapshot, SnapshotLoadError, SnapshotSaveError, SnapshotStore, SnapshotUse,
 };
 
+/// **English:** Exposes fallible specifications and their short-circuiting boolean wrappers.
+///
+/// **日本語:** 失敗し得る仕様と、短絡評価する論理演算のラッパーを公開します。
+pub use specification::{And, Not, Or, Specification};
+
 /// **English:** Exposes the outbox persistence port, owned claims, and acknowledgement identifiers.
 ///
 /// **日本語:** アウトボックス永続化ポート、所有された取得結果、確認応答用の識別子を公開します。
 pub use transactional_outbox::{OutboxClaim, OutboxMessageId, TransactionalOutbox};
+
+/// **English:** Exposes [`unit_of_work::UnitOfWork`] for explicit change registration and transaction requests.
+///
+/// **日本語:** 明示的な変更登録とトランザクション要求に使う [`unit_of_work::UnitOfWork`] を公開します。
+pub use unit_of_work::UnitOfWork;
 
 /// **English:** Re-exports the [`value_object::ValueObject`] trait for the crate's public API.
 ///
