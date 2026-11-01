@@ -20,8 +20,6 @@ Before opening a PR, run the same checks CI runs (see
 ```sh
 cargo test --no-default-features
 cargo test
-cargo test --features chrono
-cargo test --features uuid
 cargo test --features serde
 cargo test --all-features
 
