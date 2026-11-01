@@ -13,6 +13,7 @@ mod aggregate_root;
 mod async_dispatch;
 mod async_domain_event_publisher;
 mod async_repository;
+mod cqrs;
 mod dispatch;
 mod domain_event;
 mod domain_event_conversion;
@@ -47,6 +48,15 @@ pub use async_domain_event_publisher::AsyncDomainEventPublisher;
 /// **日本語:** 集約に対する非同期永続化操作のトレイト [`async_repository::AsyncRepository`] を
 /// 再エクスポートします。
 pub use async_repository::AsyncRepository;
+
+/// **English:** Re-exports synchronous and asynchronous CQRS handlers, aggregate creators, and lifecycle APIs.
+///
+/// **日本語:** 同期・非同期の CQRS ハンドラー、集約作成器、ライフサイクル API を再エクスポートします。
+pub use cqrs::{
+    AggregateCreator, AsyncAggregateCreator, AsyncCommandHandler, AsyncLifecycleCallback,
+    AsyncLifecycleContext, AsyncQueryHandler, CommandHandler, LifecycleCallback,
+    LifecycleCompletionError, LifecycleContext, LifecycleOperationError, QueryHandler,
+};
 
 /// **English:** Publishes all currently pending events from an aggregate.
 ///
