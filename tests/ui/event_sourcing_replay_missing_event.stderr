@@ -1,0 +1,16 @@
+error[E0277]: the trait bound `NotEvent: DomainEvent` is not satisfied
+ --> tests/ui/event_sourcing_replay_missing_event.rs:5:49
+  |
+5 | impl AggregateRoot for Aggregate { type Event = NotEvent; fn record_event(&mut self, _: NotEvent) {} fn pull_events(&mut self) -> Ve...
+  |                                                 ^^^^^^^^ unsatisfied trait bound
+  |
+help: the trait `DomainEvent` is not implemented for `NotEvent`
+ --> tests/ui/event_sourcing_replay_missing_event.rs:2:1
+  |
+2 | struct NotEvent;
+  | ^^^^^^^^^^^^^^^
+note: required by a bound in `ddd_toolkit_core::AggregateRoot::Event`
+ --> src/aggregate_root.rs
+  |
+  |     type Event: DomainEvent;
+  |                 ^^^^^^^^^^^ required by this bound in `AggregateRoot::Event`

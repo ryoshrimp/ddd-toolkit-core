@@ -11,7 +11,18 @@
 mod async_query_handler;
 mod query_handler;
 
+/// **English:** Re-exports asynchronous command and query handlers, aggregate creators,
+/// lifecycle callbacks, and the context coordinating persistence and event dispatch.
+///
+/// **日本語:** 非同期のコマンド・クエリハンドラー、集約作成器、ライフサイクルコールバック、
+/// 永続化とイベント配信を調整するコンテキストを再エクスポートします。
 pub use async_query_handler::*;
+
+/// **English:** Re-exports synchronous command and query handlers, aggregate creators,
+/// lifecycle callbacks, and the context coordinating aggregate saves and event dispatch.
+///
+/// **日本語:** 同期のコマンド・クエリハンドラー、集約作成器、ライフサイクルコールバック、
+/// 集約保存とイベント配信を調整するコンテキストを再エクスポートします。
 pub use query_handler::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

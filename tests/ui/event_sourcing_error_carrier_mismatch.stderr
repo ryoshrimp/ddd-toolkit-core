@@ -1,0 +1,11 @@
+error[E0308]: mismatched types
+  --> tests/ui/event_sourcing_error_carrier_mismatch.rs:11:6
+   |
+ 9 |  fn load(&self, _: &u64)->Result<ddd_toolkit_core::LoadResult<Event>,()>{
+   |                           ---------------------------------------------- expected `Result<LoadResult<Event>, ()>` because of return type
+10 |      let result: Result<Result<(), ()>, ()> = Ok(Err(()));
+11 |      result
+   |      ^^^^^^ expected `Result<LoadResult<Event>, ()>`, found `Result<Result<(), ()>, ()>`
+   |
+   = note: expected enum `Result<LoadResult<Event>, ()>`
+              found enum `Result<Result<(), ()>, ()>`
