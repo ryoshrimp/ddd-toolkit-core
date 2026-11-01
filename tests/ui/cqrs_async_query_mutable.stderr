@@ -1,0 +1,16 @@
+error[E0195]: lifetime parameters or bounds on method `handle` do not match the trait declaration
+  --> tests/ui/cqrs_async_query_mutable.rs:12:14
+   |
+12 |       fn handle<'a>(
+   |                ^^^^ lifetimes do not match method in trait
+   |
+  ::: src/cqrs/async_query_handler.rs
+   |
+   | /     fn handle<'a>(
+   | |         &'a self,
+   | |         query: Self::Query,
+   | |     ) -> Pin<Box<dyn Future<Output = Result<Self::Result, Self::Error>> + Send + 'a>>
+...  |
+   | |         Self::Result: Send + 'a,
+   | |         Self::Error: Send + 'a;
+   | |_______________________________- lifetimes in impl do not match this method in trait
