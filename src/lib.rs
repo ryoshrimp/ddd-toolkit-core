@@ -51,14 +51,30 @@
 //! **日本語:** [`TransactionalOutboxLifecycleContext`] は保存・登録の一回の試行を追跡します。
 //! 保留イベントを取り出して失敗時も復元せず、繰り返しの試行を拒否し、完了確認時に
 //! 未試行や未成功を報告します。トランザクション自体は実装しません。
+//!
+//! **English:** [`AsyncTransactionalOutbox`] provides future-based outbox operations.
+//! [`AsyncTransactionalOutboxLifecycleContext`] consumes an attempt and pulls events before polling;
+//! dropping its future does not restore events. [`ProjectionCheckpoint`] carries application-defined
+//! progress for [`ProjectionCheckpointStore`], while [`IdempotentProjection`] reports applied or
+//! duplicate input via [`ProjectionApplication`]. Implementations supply duplicate detection and
+//! coordination between checkpoint persistence and read-model changes.
+//!
+//! **日本語:** [`AsyncTransactionalOutbox`] は Future によるアウトボックス操作を提供します。
+//! [`AsyncTransactionalOutboxLifecycleContext`] はポーリング前に試行を消費してイベントを取り出し、
+//! Future の破棄でも復元しません。[`ProjectionCheckpoint`] はアプリケーション定義の進捗を
+//! [`ProjectionCheckpointStore`] に渡し、[`IdempotentProjection`] は適用または重複を
+//! [`ProjectionApplication`] で報告します。重複検出と、チェックポイント永続化・読み取りモデル変更の
+//! 連携は実装が提供します。
 
 mod aggregate_root;
 mod async_dispatch;
 mod async_domain_event_publisher;
 mod async_event_consumption;
 mod async_event_store;
+mod async_outbox_lifecycle;
 mod async_repository;
 mod async_snapshot;
+mod async_transactional_outbox;
 mod cqrs;
 mod dispatch;
 mod domain_event;
@@ -70,6 +86,7 @@ mod event_consumption;
 mod event_delivery_metadata;
 mod event_store;
 mod outbox_lifecycle;
+mod projection_reliability;
 mod replay;
 mod repository;
 mod secret;
@@ -107,6 +124,15 @@ pub use async_event_consumption::{AsyncEventConsumer, AsyncProjection};
 /// **日本語:** Future によるイベント永続化の [`async_event_store::AsyncEventStore`] を公開します。
 pub use async_event_store::AsyncEventStore;
 
+/// **English:** Exposes asynchronous single-attempt enqueue tracking, errors, and their short aliases.
+///
+/// **日本語:** 非同期登録の一回の試行追跡、エラー、短い別名を公開します。
+pub use async_outbox_lifecycle::{
+    AsyncOutboxLifecycleCompletionError, AsyncOutboxLifecycleContext,
+    AsyncOutboxLifecycleOperationError, AsyncTransactionalOutboxCompletionError,
+    AsyncTransactionalOutboxLifecycleContext, AsyncTransactionalOutboxOperationError,
+};
+
 /// **English:** Re-exports [`async_repository::AsyncRepository`], the trait for asynchronous
 /// persistence operations on aggregates.
 ///
@@ -118,6 +144,11 @@ pub use async_repository::AsyncRepository;
 ///
 /// **日本語:** 非同期スナップショット保存の [`async_snapshot::AsyncSnapshotStore`] を公開します。
 pub use async_snapshot::AsyncSnapshotStore;
+
+/// **English:** Exposes [`async_transactional_outbox::AsyncTransactionalOutbox`] for asynchronous save, claim, and acknowledgement.
+///
+/// **日本語:** 非同期の保存、取得、確認応答の [`async_transactional_outbox::AsyncTransactionalOutbox`] を公開します。
+pub use async_transactional_outbox::AsyncTransactionalOutbox;
 
 /// **English:** Re-exports synchronous and asynchronous CQRS handlers, aggregate creators, and lifecycle APIs.
 ///
@@ -197,6 +228,13 @@ pub use outbox_lifecycle::{
     OutboxLifecycleCompletionError, OutboxLifecycleContext, OutboxLifecycleOperationError,
     TransactionalOutboxCompletionError, TransactionalOutboxLifecycleContext,
     TransactionalOutboxOperationError,
+};
+
+/// **English:** Exposes typed projection progress, checkpoint storage, and duplicate-aware application contracts.
+///
+/// **日本語:** 型付きのプロジェクション進捗、チェックポイント保存、重複を区別する適用契約を公開します。
+pub use projection_reliability::{
+    IdempotentProjection, ProjectionApplication, ProjectionCheckpoint, ProjectionCheckpointStore,
 };
 
 /// **English:** Re-exports aggregate reconstruction hooks, replay helpers, results, and failure types.
