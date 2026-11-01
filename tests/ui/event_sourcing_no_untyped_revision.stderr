@@ -1,0 +1,21 @@
+error[E0277]: the trait bound `StreamRevision: From<&str>` is not satisfied
+ --> tests/ui/event_sourcing_no_untyped_revision.rs:3:33
+  |
+3 |     let _: StreamRevision = "0".into();
+  |                                 ^^^^ the trait `From<&str>` is not implemented for `StreamRevision`
+  |
+  = note: required for `&str` to implement `Into<StreamRevision>`
+
+error[E0308]: mismatched types
+ --> tests/ui/event_sourcing_no_untyped_revision.rs:4:58
+  |
+4 |     let _: ExpectedRevision = ExpectedRevision::Revision(0);
+  |                               -------------------------- ^ expected `StreamRevision`, found integer
+  |                               |
+  |                               arguments to this enum variant are incorrect
+  |
+note: tuple variant defined here
+ --> src/event_store.rs
+  |
+  |     Revision(StreamRevision),
+  |     ^^^^^^^^

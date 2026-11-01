@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-01
+
+### Changed
+
+- **Breaking:** replaced the previous `domain`, `port`, `adapter`, `mock`, and
+  `application` module API with traits and helpers re-exported from the crate
+  root. Existing implementations and imports must be migrated; this is not a
+  drop-in update from 0.3.x.
+- Domain types implement `Entity`, `ValueObject`, `AggregateRoot`, and
+  `DomainEvent` directly. Aggregate event queues use `record_event` and
+  `pull_events`; repositories and event publishers have separate contracts.
+- Async ports return boxed `Send` futures without choosing an async runtime.
+  Storage, concurrency, transaction, retry, and delivery guarantees belong to
+  adapters and applications.
+- Replaced the README examples with current API examples and added a Japanese
+  README and bilingual English/Japanese API documentation.
+
+### Added
+
+- Synchronous and asynchronous repository, event publishing, dispatch, CQRS,
+  and lifecycle contracts, with error and cancellation contract tests.
+- Event-sourcing history/revision types, event stores, aggregate replay,
+  snapshots, and optional-snapshot replay helpers.
+- Event consumption, delivery metadata, transactional outbox ports and
+  single-attempt lifecycle contexts, and checkpoint/idempotent projection ports.
+- `Specification` composition, domain service/policy/factory contracts,
+  process-manager transitions, unit-of-work contracts, and event upcaster chains.
+- `Secret<T>` with explicit plaintext access, redacted formatting, and
+  `zeroize`-based cleanup, plus the `SecretMetadata` marker.
+
+### Removed
+
+- **Breaking:** legacy traits and helpers such as `EntityId`, `Wrapped`,
+  `SecretVo`, `EnumVo`, `ValidationError`, `UseCase`, `Load`/`Save`/`Delete`,
+  `EventDispatcher`, `Clock`, `IdGenerator`, and `PortError`, along with the
+  built-in storage, clock, and ID-generator adapters and test doubles.
+- **Breaking:** `chrono` and `uuid` features and dependencies. The remaining
+  optional `serde` feature exposes serde for generated implementations; it no
+  longer derives serialization for the removed `ValidationError` type.
+- The `trait-variant` dependency.
+
 ## [0.3.0] - 2026-07-21
 
 ### Added
@@ -115,7 +156,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Poisoned mutexes in `mock` are recovered from instead of panicking forever.
 - `SystemClock` tests no longer assert wall-clock monotonicity.
 
-[Unreleased]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.3...HEAD
+[Unreleased]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.3...v0.3.0
 [0.2.3]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/ryoshrimp/ddd-toolkit-core/compare/v0.2.0...v0.2.1

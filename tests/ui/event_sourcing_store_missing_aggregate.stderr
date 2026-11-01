@@ -1,0 +1,40 @@
+error[E0277]: the trait bound `NotAggregate: AggregateRoot` is not satisfied
+ --> tests/ui/event_sourcing_store_missing_aggregate.rs:5:22
+  |
+5 |     type Aggregate = NotAggregate;
+  |                      ^^^^^^^^^^^^ unsatisfied trait bound
+  |
+help: the trait `AggregateRoot` is not implemented for `NotAggregate`
+ --> tests/ui/event_sourcing_store_missing_aggregate.rs:2:1
+  |
+2 | struct NotAggregate;
+  | ^^^^^^^^^^^^^^^^^^^
+note: required by a bound in `ddd_toolkit_core::EventStore::Aggregate`
+ --> src/event_store.rs
+  |
+  |     type Aggregate: AggregateRoot;
+  |                     ^^^^^^^^^^^^^ required by this bound in `EventStore::Aggregate`
+
+error[E0277]: the trait bound `NotAggregate: AggregateRoot` is not satisfied
+ --> tests/ui/event_sourcing_store_missing_aggregate.rs:7:5
+  |
+7 |     fn load(&self, _: &()) -> Result<LoadResult<()>, ()> { unreachable!() }
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+  |
+help: the trait `AggregateRoot` is not implemented for `NotAggregate`
+ --> tests/ui/event_sourcing_store_missing_aggregate.rs:2:1
+  |
+2 | struct NotAggregate;
+  | ^^^^^^^^^^^^^^^^^^^
+
+error[E0277]: the trait bound `NotAggregate: AggregateRoot` is not satisfied
+ --> tests/ui/event_sourcing_store_missing_aggregate.rs:8:5
+  |
+8 |     fn append(&mut self, _: &(), _: ExpectedRevision, _: Vec<()>) -> Result<AppendResult, AppendError<()>> { unreachable!() }
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+  |
+help: the trait `AggregateRoot` is not implemented for `NotAggregate`
+ --> tests/ui/event_sourcing_store_missing_aggregate.rs:2:1
+  |
+2 | struct NotAggregate;
+  | ^^^^^^^^^^^^^^^^^^^

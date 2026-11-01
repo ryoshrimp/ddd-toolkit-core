@@ -1,0 +1,40 @@
+error[E0277]: the trait bound `NotAggregate: AggregateRoot` is not satisfied
+ --> tests/ui/event_sourcing_snapshot_missing_aggregate.rs:5:19
+  |
+5 |  type Aggregate = NotAggregate; type State = (); type Error = ();
+  |                   ^^^^^^^^^^^^ unsatisfied trait bound
+  |
+help: the trait `AggregateRoot` is not implemented for `NotAggregate`
+ --> tests/ui/event_sourcing_snapshot_missing_aggregate.rs:2:1
+  |
+2 | struct NotAggregate;
+  | ^^^^^^^^^^^^^^^^^^^
+note: required by a bound in `ddd_toolkit_core::SnapshotStore::Aggregate`
+ --> src/snapshot.rs
+  |
+  |     type Aggregate: AggregateRoot;
+  |                     ^^^^^^^^^^^^^ required by this bound in `SnapshotStore::Aggregate`
+
+error[E0277]: the trait bound `NotAggregate: Entity` is not satisfied
+ --> tests/ui/event_sourcing_snapshot_missing_aggregate.rs:6:2
+  |
+6 |  fn load(&self, _: &())->Result<Option<AggregateSnapshot<()>>, SnapshotLoadError<()>>{unreachable!()}
+  |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+  |
+help: the trait `Entity` is not implemented for `NotAggregate`
+ --> tests/ui/event_sourcing_snapshot_missing_aggregate.rs:2:1
+  |
+2 | struct NotAggregate;
+  | ^^^^^^^^^^^^^^^^^^^
+
+error[E0277]: the trait bound `NotAggregate: Entity` is not satisfied
+ --> tests/ui/event_sourcing_snapshot_missing_aggregate.rs:7:2
+  |
+7 |  fn save(&mut self, _: &(), _: AggregateSnapshot<()>) -> Result<(), SnapshotSaveError<()>>{unreachable!()}
+  |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+  |
+help: the trait `Entity` is not implemented for `NotAggregate`
+ --> tests/ui/event_sourcing_snapshot_missing_aggregate.rs:2:1
+  |
+2 | struct NotAggregate;
+  | ^^^^^^^^^^^^^^^^^^^

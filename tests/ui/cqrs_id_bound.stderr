@@ -1,0 +1,97 @@
+error[E0271]: type mismatch resolving `<BadRepo as Repository>::Aggregate == Aggregate`
+  --> tests/ui/cqrs_id_bound.rs:45:5
+   |
+45 | /     fn call<'callback>(self, _: &'callback mut LifecycleContext<'storage, Aggregate, BadRepo, Publisher>) -> Result<(), Error>
+46 | |     where 'storage: 'callback { Ok(()) }
+   | |_____________________________^ type mismatch resolving `<BadRepo as Repository>::Aggregate == Aggregate`
+   |
+note: expected this to be `Aggregate`
+  --> tests/ui/cqrs_id_bound.rs:21:22
+   |
+21 |     type Aggregate = Other;
+   |                      ^^^^^
+note: required by a bound in `LifecycleContext`
+  --> src/cqrs/query_handler.rs
+   |
+   | pub struct LifecycleContext<'a, A, R, P>
+   |            ---------------- required by a bound in this struct
+...
+   |     R: Repository<Aggregate = A>,
+   |                   ^^^^^^^^^^^^^ required by this bound in `LifecycleContext`
+
+error[E0271]: type mismatch resolving `<BadRepo as Repository>::Aggregate == Aggregate`
+  --> tests/ui/cqrs_id_bound.rs:42:16
+   |
+42 | impl<'storage> LifecycleCallback<'storage, Aggregate, BadRepo, Publisher> for Callback {
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ type mismatch resolving `<BadRepo as Repository>::Aggregate == Aggregate`
+   |
+note: expected this to be `Aggregate`
+  --> tests/ui/cqrs_id_bound.rs:21:22
+   |
+21 |     type Aggregate = Other;
+   |                      ^^^^^
+note: required by a bound in `LifecycleCallback`
+  --> src/cqrs/query_handler.rs
+   |
+   | pub trait LifecycleCallback<'storage, A, R, P>
+   |           ----------------- required by a bound in this trait
+...
+   |     R: Repository<Aggregate = A>,
+   |                   ^^^^^^^^^^^^^ required by this bound in `LifecycleCallback`
+
+error[E0271]: type mismatch resolving `<BadRepo as Repository>::Aggregate == Aggregate`
+  --> tests/ui/cqrs_id_bound.rs:52:23
+   |
+52 |     type Repository = BadRepo;
+   |                       ^^^^^^^ type mismatch resolving `<BadRepo as Repository>::Aggregate == Aggregate`
+   |
+note: expected this to be `Aggregate`
+  --> tests/ui/cqrs_id_bound.rs:21:22
+   |
+21 |     type Aggregate = Other;
+   |                      ^^^^^
+note: required by a bound in `ddd_toolkit_core::CommandHandler::Repository`
+  --> src/cqrs/query_handler.rs
+   |
+   |     type Repository: Repository<Aggregate = Self::Aggregate>;
+   |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `CommandHandler::Repository`
+
+error[E0271]: type mismatch resolving `<BadRepo as Repository>::Aggregate == Aggregate`
+  --> tests/ui/cqrs_id_bound.rs:45:33
+   |
+45 |     fn call<'callback>(self, _: &'callback mut LifecycleContext<'storage, Aggregate, BadRepo, Publisher>) -> Result<(), Error>
+   |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ type mismatch resolving `<BadRepo as Repository>::Aggregate == Aggregate`
+   |
+note: expected this to be `Aggregate`
+  --> tests/ui/cqrs_id_bound.rs:21:22
+   |
+21 |     type Aggregate = Other;
+   |                      ^^^^^
+note: required by a bound in `LifecycleContext`
+  --> src/cqrs/query_handler.rs
+   |
+   | pub struct LifecycleContext<'a, A, R, P>
+   |            ---------------- required by a bound in this struct
+...
+   |     R: Repository<Aggregate = A>,
+   |                   ^^^^^^^^^^^^^ required by this bound in `LifecycleContext`
+
+error[E0271]: type mismatch resolving `<BadRepo as Repository>::Aggregate == Aggregate`
+  --> tests/ui/cqrs_id_bound.rs:58:12
+   |
+58 |         F: for<'a> LifecycleCallback<'a, Aggregate, BadRepo, Publisher, Output = (), Error = Error>,
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ type mismatch resolving `<BadRepo as Repository>::Aggregate == Aggregate`
+   |
+note: expected this to be `Aggregate`
+  --> tests/ui/cqrs_id_bound.rs:21:22
+   |
+21 |     type Aggregate = Other;
+   |                      ^^^^^
+note: required by a bound in `LifecycleCallback`
+  --> src/cqrs/query_handler.rs
+   |
+   | pub trait LifecycleCallback<'storage, A, R, P>
+   |           ----------------- required by a bound in this trait
+...
+   |     R: Repository<Aggregate = A>,
+   |                   ^^^^^^^^^^^^^ required by this bound in `LifecycleCallback`
