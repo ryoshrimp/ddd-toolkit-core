@@ -67,6 +67,16 @@
 //! 連携は実装が提供します。
 
 //!
+//! **English:** [`AsyncProjectionCheckpointStore`] persists progress through boxed `Send` futures,
+//! and [`AsyncIdempotentProjection`] asynchronously distinguishes new application from duplicates.
+//! These independent ports do not coordinate transactions; dropping a future does not guarantee
+//! rollback or absence of side effects. Implementations define cancellation and retry semantics.
+//!
+//! **日本語:** [`AsyncProjectionCheckpointStore`] はボックス化された `Send` Future で進捗を永続化し、
+//! [`AsyncIdempotentProjection`] は新規適用と重複を非同期に区別します。これらの独立したポートは
+//! トランザクションを調整せず、Future の破棄はロールバックや副作用の不在を保証しません。
+//! キャンセルと再試行の意味は実装が定めます。
+//!
 //! **English:** [`Specification`] composes fallible predicates with short-circuiting [`And`],
 //! [`Or`], and [`Not`]. [`DomainService`], [`Policy`], and [`DomainFactory`] define typed operation,
 //! rule-checking, and construction boundaries without prescribing persistence or thread safety.
@@ -274,11 +284,12 @@ pub use outbox_lifecycle::{
 /// **日本語:** プロセスの遷移計算と、所有された状態・副作用の結果を公開します。
 pub use process_manager::{ProcessManager, Transition};
 
-/// **English:** Exposes typed projection progress, checkpoint storage, and duplicate-aware application contracts.
+/// **English:** Exposes typed projection progress and synchronous/asynchronous checkpoint and duplicate-aware application ports.
 ///
-/// **日本語:** 型付きのプロジェクション進捗、チェックポイント保存、重複を区別する適用契約を公開します。
+/// **日本語:** 型付きのプロジェクション進捗と、同期・非同期のチェックポイント保存および重複を区別する適用ポートを公開します。
 pub use projection_reliability::{
-    IdempotentProjection, ProjectionApplication, ProjectionCheckpoint, ProjectionCheckpointStore,
+    AsyncIdempotentProjection, AsyncProjectionCheckpointStore, IdempotentProjection,
+    ProjectionApplication, ProjectionCheckpoint, ProjectionCheckpointStore,
 };
 
 /// **English:** Re-exports aggregate reconstruction hooks, replay helpers, results, and failure types.
