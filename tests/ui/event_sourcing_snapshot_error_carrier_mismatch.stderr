@@ -1,22 +1,11 @@
 error[E0308]: mismatched types
-  --> tests/ui/event_sourcing_snapshot_error_carrier_mismatch.rs:35:12
+  --> tests/ui/event_sourcing_snapshot_error_carrier_mismatch.rs:36:9
    |
-35 |         Ok(Err(()))
-   |         -- ^^^^^^^ expected `Option<AggregateSnapshot<u32>>`, found `Result<_, ()>`
-   |         |
-   |         arguments to this enum variant are incorrect
+34 |     ) -> Result<Option<AggregateSnapshot<u32>>, SnapshotLoadError<()>> {
+   |          ------------------------------------------------------------- expected `Result<Option<AggregateSnapshot<u32>>, SnapshotLoadError<()>>` because of return type
+35 |         let result: Result<Result<(), ()>, SnapshotLoadError<()>> = Ok(Err(()));
+36 |         result
+   |         ^^^^^^ expected `Result<Option<...>, ...>`, found `Result<Result<(), ()>, ...>`
    |
-   = note: expected enum `Option<AggregateSnapshot<u32>>`
-              found enum `Result<_, ()>`
-help: the type constructed contains `Result<_, ()>` due to the type of the argument passed
-  --> tests/ui/event_sourcing_snapshot_error_carrier_mismatch.rs:35:9
-   |
-35 |         Ok(Err(()))
-   |         ^^^-------^
-   |            |
-   |            this argument influences the type of `Ok`
-note: tuple variant defined here
-  --> $RUST/core/src/result.rs
-   |
-   |     Ok(#[stable(feature = "rust1", since = "1.0.0")] T),
-   |     ^^
+   = note: expected enum `Result<Option<AggregateSnapshot<u32>>, SnapshotLoadError<()>>`
+              found enum `Result<Result<(), ()>, SnapshotLoadError<()>>`

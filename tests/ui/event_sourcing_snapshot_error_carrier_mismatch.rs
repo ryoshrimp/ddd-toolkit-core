@@ -32,7 +32,8 @@ impl SnapshotStore for Store {
         &self,
         _: &u64,
     ) -> Result<Option<AggregateSnapshot<u32>>, SnapshotLoadError<()>> {
-        Ok(Err(()))
+        let result: Result<Result<(), ()>, SnapshotLoadError<()>> = Ok(Err(()));
+        result
     }
 
     fn save(

@@ -6,7 +6,10 @@ impl AggregateRoot for Aggregate { type Event=Event; fn record_event(&mut self, 
 struct Store;
 impl EventStore for Store {
  type Aggregate=Aggregate; type Error=();
- fn load(&self, _: &u64)->Result<ddd_toolkit_core::LoadResult<Event>,()>{Ok(Err(()))}
+ fn load(&self, _: &u64)->Result<ddd_toolkit_core::LoadResult<Event>,()>{
+     let result: Result<Result<(), ()>, ()> = Ok(Err(()));
+     result
+ }
  fn append(&mut self, _: &u64, _: ExpectedRevision, _: Vec<Event>)->Result<ddd_toolkit_core::AppendResult, ddd_toolkit_core::AppendError<()>>{unreachable!()}
 }
 fn main() {}
